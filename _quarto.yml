@@ -11,9 +11,9 @@ website:
       - text: "Weekly Notes"
         menu:
           - href: weekly-notes/
-          - text: "All Notes"
+            text: "All Notes"
           - href: weekly-notes/week-01-notes.qmd
-          - text: "Week 1 Notes"
+            text: "Week 1 Notes"
 
 format:
   html:
