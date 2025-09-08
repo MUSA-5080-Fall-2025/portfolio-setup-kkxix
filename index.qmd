@@ -15,8 +15,8 @@ Advanced spatial analysis and data science for urban planning and public policy.
 - **Final Project:** Capstone modeling challenge
 
 ## About Me
-[Students will customize this section]
+Hello! I am Katie Knox, a first-year MCP student at University of Pennsylvania. Go birds!
 
 ## Contact
-- Email: [your.email@upenn.edu]
-- GitHub: [@your-username]
+- Email: [knox1@upenn.edu]
+- GitHub: [@kkxix]
