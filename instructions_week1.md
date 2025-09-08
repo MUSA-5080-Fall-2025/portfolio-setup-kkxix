@@ -6,7 +6,7 @@ Welcome to MUSA 5080! This guide will help you set up your personal portfolio re
 
 By the end of this setup, you'll have:
 - Your own portfolio repository on GitHub
--  live website showcasing your work
+- live website showcasing your work
 - A place to document your learning journey
 
 ## Example:
