@@ -10,6 +10,8 @@ website:
         text: Home
       - href: weekly-notes/
         text: Weekly Notes
+      - href: weekly-notes/week-010notes.qmd
+        text: "Week 1 Notes"
 
 format:
   html:
