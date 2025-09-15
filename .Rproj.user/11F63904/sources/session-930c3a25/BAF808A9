@@ -1,0 +1,27 @@
+{
+    "id": "BAF808A9",
+    "path": "~/musa-5080/portfolio-setup-kkxix/labs/lab0/scripts/lab0_template.qmd",
+    "project_path": "labs/lab0/scripts/lab0_template.qmd",
+    "type": "quarto_markdown",
+    "hash": "420357353",
+    "contents": "",
+    "dirty": false,
+    "created": 1757947890303.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "102,0",
+        "scrollLine": "101",
+        "last_setup_crc32": "930c3a25d06fb786"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1757951324,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1757951324937,
+    "read_only": false,
+    "read_only_alternatives": []
+}
