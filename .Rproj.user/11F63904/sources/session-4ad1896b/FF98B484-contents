@@ -1,0 +1,59 @@
+---
+title: "Week 1 Notes - Course Introduction"
+date: "2025-09-08"
+---
+
+## Key Concepts Learned
+- Main concepts: 
+  - Breakdown of syllabus (stay on toes for weekly quizzes)
+- Technical skills covered
+  - RStudio 
+  - Quarto
+  - Git and Github 
+
+## Coding Techniques
+- R functions: 
+  - select() - choose columns
+  - filter() - choose rows
+  - mutate() - create new variables
+  - summarize() - calculate statistics
+  - group_by() - operate on groups 
+  - names() - column names 
+  - glimpse() - little glimpse of data
+  
+- Quarto features learned:
+  - Quarto is cool and hip :-) 
+  - A way to show code snippets, run code blocks, share visuals, and share text as a webpage or slides (kinda like python notebook or observable)
+
+
+common syntax pattern: 
+`save_to <- function(df, ...)`
+
+everything except column:
+`select(df, -col_to_exclude)`
+
+another common pattern:
+`mutate(df, new_col = case_when(condition ~ code, TRUE ~ code2)`
+
+**Iconic couple: group_by() and summarize()**
+- group_by() -- create categories out of values in a column 
+- summarize() -- summarize values in another column by a user-defined function 
+- summarize(n=n()) -- basic count of grouped categories 
+
+piped syntax pattern: 
+`save_to <- df %>% function(...) %>% funciton(...)`
+^^you don't need df as first argument if first you state df and pass to functions through pipe 
+
+## Questions & Challenges
+- Why don't you need to include df as argument when you are using piping syntax? 
+
+## Connections to Policy
+- Got a preview of policy topics we will cover over semester: 
+  - housing 
+  - recidivism 
+  - bikeshare equity 
+- What sets this apart from stats is emphasis on *prediction*
+
+## Reflection
+- Hype for this course! 
+- Phillies > Mets

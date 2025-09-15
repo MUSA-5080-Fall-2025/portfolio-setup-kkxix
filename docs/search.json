@@ -1,80 +1,45 @@
 [
   {
-    "objectID": "weekly-notes/week-01-notes.html",
-    "href": "weekly-notes/week-01-notes.html",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html",
+    "href": "weekly-notes/week-02-notes.html",
+    "title": "Week 2 Notes",
     "section": "",
-    "text": "Main concepts:\n\nBreakdown of syllabus (stay on toes for weekly quizzes)\n\nTechnical skills covered\n\nRStudio\nQuarto\nGit and Github"
+    "text": "Main concepts:\nTechnical skills covered:"
   },
   {
-    "objectID": "weekly-notes/week-01-notes.html#key-concepts-learned",
-    "href": "weekly-notes/week-01-notes.html#key-concepts-learned",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-02-notes.html#key-concepts-learned",
+    "title": "Week 2 Notes",
     "section": "",
-    "text": "Main concepts:\n\nBreakdown of syllabus (stay on toes for weekly quizzes)\n\nTechnical skills covered\n\nRStudio\nQuarto\nGit and Github"
+    "text": "Main concepts:\nTechnical skills covered:"
   },
   {
-    "objectID": "weekly-notes/week-01-notes.html#coding-techniques",
-    "href": "weekly-notes/week-01-notes.html#coding-techniques",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html#coding-techniques",
+    "href": "weekly-notes/week-02-notes.html#coding-techniques",
+    "title": "Week 2 Notes",
     "section": "Coding Techniques",
-    "text": "Coding Techniques\n\nR functions:\n\nselect() - choose columns\nfilter() - choose rows\nmutate() - create new variables\nsummarize() - calculate statistics\ngroup_by() - operate on groups\nnames() - column names\nglimpse() - little glimpse of data\n\nQuarto features learned:\n\nQuarto is cool and hip :-)\nA way to show code snippets, run code blocks, share visuals, and share text as a webpage or slides (kinda like python notebook or observable)\n\n\ncommon syntax pattern: save_to &lt;- function(df, ...)\neverything except column: select(df, -col_to_exclude)\nanother common pattern: mutate(df, new_col = case_when(condition ~ code, TRUE ~ code2)\nIconic couple: group_by() and summarize() - group_by() – create categories out of values in a column - summarize() – summarize values in another column by a user-defined function - summarize(n=n()) – basic count of grouped categories\npiped syntax pattern: save_to &lt;- df %&gt;% function(...) %&gt;% funciton(...) ^^you don’t need df as first argument if first you state df and pass to functions through pipe"
+    "text": "Coding Techniques"
   },
   {
-    "objectID": "weekly-notes/week-01-notes.html#questions-challenges",
-    "href": "weekly-notes/week-01-notes.html#questions-challenges",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html#questions-challenges",
+    "href": "weekly-notes/week-02-notes.html#questions-challenges",
+    "title": "Week 2 Notes",
     "section": "Questions & Challenges",
-    "text": "Questions & Challenges\n\nWhy don’t you need to include df as argument when you are using piping syntax?"
+    "text": "Questions & Challenges"
   },
   {
-    "objectID": "weekly-notes/week-01-notes.html#connections-to-policy",
-    "href": "weekly-notes/week-01-notes.html#connections-to-policy",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-02-notes.html#connections-to-policy",
+    "title": "Week 2 Notes",
     "section": "Connections to Policy",
-    "text": "Connections to Policy\n\nGot a preview of policy topics we will cover over semester:\n\nhousing\nrecidivism\nbikeshare equity\n\nWhat sets this apart from stats is emphasis on prediction"
+    "text": "Connections to Policy"
   },
   {
-    "objectID": "weekly-notes/week-01-notes.html#reflection",
-    "href": "weekly-notes/week-01-notes.html#reflection",
-    "title": "Week 1 Notes - Course Introduction",
+    "objectID": "weekly-notes/week-02-notes.html#reflection",
+    "href": "weekly-notes/week-02-notes.html#reflection",
+    "title": "Week 2 Notes",
     "section": "Reflection",
-    "text": "Reflection\n\nHype for this course!\nPhillies &gt; Mets"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "MUSA 5080 Portfolio",
-    "section": "",
-    "text": "This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080).\n\n\nAdvanced spatial analysis and data science for urban planning and public policy.\n\n\n\n\nWeekly Notes: My learning reflections and key concepts\nLabs: Completed assignments and analyses\nFinal Project: Capstone modeling challenge\n\n\n\n\nHello! I am Katie Knox, a first-year MCP student at University of Pennsylvania. By undergraduate degree was in computer science and francophone studies at Swarthmore College, and for the past three years I have worked for National Digital Inclusion Alliance. I am taking this course because I want to learn how to apply data analysis skills towards public interest problems. I just moved from Toronto back to Philadelphia, so go birds! (Raptors and Eagles)\n\n\n\n\nEmail: knox1@upenn.edu\nGitHub: @kkxix"
-  },
-  {
-    "objectID": "index.html#about-this-course",
-    "href": "index.html#about-this-course",
-    "title": "MUSA 5080 Portfolio",
-    "section": "",
-    "text": "Advanced spatial analysis and data science for urban planning and public policy."
-  },
-  {
-    "objectID": "index.html#portfolio-structure",
-    "href": "index.html#portfolio-structure",
-    "title": "MUSA 5080 Portfolio",
-    "section": "",
-    "text": "Weekly Notes: My learning reflections and key concepts\nLabs: Completed assignments and analyses\nFinal Project: Capstone modeling challenge"
-  },
-  {
-    "objectID": "index.html#about-me",
-    "href": "index.html#about-me",
-    "title": "MUSA 5080 Portfolio",
-    "section": "",
-    "text": "Hello! I am Katie Knox, a first-year MCP student at University of Pennsylvania. By undergraduate degree was in computer science and francophone studies at Swarthmore College, and for the past three years I have worked for National Digital Inclusion Alliance. I am taking this course because I want to learn how to apply data analysis skills towards public interest problems. I just moved from Toronto back to Philadelphia, so go birds! (Raptors and Eagles)"
-  },
-  {
-    "objectID": "index.html#contact",
-    "href": "index.html#contact",
-    "title": "MUSA 5080 Portfolio",
-    "section": "",
-    "text": "Email: knox1@upenn.edu\nGitHub: @kkxix"
+    "text": "Reflection"
   },
   {
     "objectID": "instructions_week1.html",
@@ -159,5 +124,82 @@
     "title": "Portfolio Setup Instructions",
     "section": "",
     "text": "Before submitting, make sure you’ve: - [ ] Customized _quarto.yml with your name - [ ] Updated index.qmd with your information - [ ] Completed Week 1 notes - [ ] Enabled GitHub Pages - [ ] Verified your website loads correctly - [ ] Submitted your URL to Canvas\n\nNeed help? Don’t struggle alone - reach out during office hours (mine + TAs) or in class!"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "MUSA 5080 Portfolio",
+    "section": "",
+    "text": "This portfolio documents my learning journey in Public Policy Analytics (MUSA 5080).\n\n\nAdvanced spatial analysis and data science for urban planning and public policy.\n\n\n\n\nWeekly Notes: My learning reflections and key concepts\nLabs: Completed assignments and analyses\nFinal Project: Capstone modeling challenge\n\n\n\n\nHello! I am Katie Knox, a first-year MCP student at University of Pennsylvania. By undergraduate degree was in computer science and francophone studies at Swarthmore College, and for the past three years I have worked for National Digital Inclusion Alliance. I am taking this course because I want to learn how to apply data analysis skills towards public interest problems. I just moved from Toronto back to Philadelphia, so go birds! (Raptors and Eagles)\n\n\n\n\nEmail: knox1@upenn.edu\nGitHub: @kkxix"
+  },
+  {
+    "objectID": "index.html#about-this-course",
+    "href": "index.html#about-this-course",
+    "title": "MUSA 5080 Portfolio",
+    "section": "",
+    "text": "Advanced spatial analysis and data science for urban planning and public policy."
+  },
+  {
+    "objectID": "index.html#portfolio-structure",
+    "href": "index.html#portfolio-structure",
+    "title": "MUSA 5080 Portfolio",
+    "section": "",
+    "text": "Weekly Notes: My learning reflections and key concepts\nLabs: Completed assignments and analyses\nFinal Project: Capstone modeling challenge"
+  },
+  {
+    "objectID": "index.html#about-me",
+    "href": "index.html#about-me",
+    "title": "MUSA 5080 Portfolio",
+    "section": "",
+    "text": "Hello! I am Katie Knox, a first-year MCP student at University of Pennsylvania. By undergraduate degree was in computer science and francophone studies at Swarthmore College, and for the past three years I have worked for National Digital Inclusion Alliance. I am taking this course because I want to learn how to apply data analysis skills towards public interest problems. I just moved from Toronto back to Philadelphia, so go birds! (Raptors and Eagles)"
+  },
+  {
+    "objectID": "index.html#contact",
+    "href": "index.html#contact",
+    "title": "MUSA 5080 Portfolio",
+    "section": "",
+    "text": "Email: knox1@upenn.edu\nGitHub: @kkxix"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html",
+    "href": "weekly-notes/week-01-notes.html",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "",
+    "text": "Main concepts:\n\nBreakdown of syllabus (stay on toes for weekly quizzes)\n\nTechnical skills covered\n\nRStudio\nQuarto\nGit and Github"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-01-notes.html#key-concepts-learned",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "",
+    "text": "Main concepts:\n\nBreakdown of syllabus (stay on toes for weekly quizzes)\n\nTechnical skills covered\n\nRStudio\nQuarto\nGit and Github"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html#coding-techniques",
+    "href": "weekly-notes/week-01-notes.html#coding-techniques",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "Coding Techniques",
+    "text": "Coding Techniques\n\nR functions:\n\nselect() - choose columns\nfilter() - choose rows\nmutate() - create new variables\nsummarize() - calculate statistics\ngroup_by() - operate on groups\nnames() - column names\nglimpse() - little glimpse of data\n\nQuarto features learned:\n\nQuarto is cool and hip :-)\nA way to show code snippets, run code blocks, share visuals, and share text as a webpage or slides (kinda like python notebook or observable)\n\n\ncommon syntax pattern: save_to &lt;- function(df, ...)\neverything except column: select(df, -col_to_exclude)\nanother common pattern: mutate(df, new_col = case_when(condition ~ code, TRUE ~ code2)\nIconic couple: group_by() and summarize() - group_by() – create categories out of values in a column - summarize() – summarize values in another column by a user-defined function - summarize(n=n()) – basic count of grouped categories\npiped syntax pattern: save_to &lt;- df %&gt;% function(...) %&gt;% funciton(...) ^^you don’t need df as first argument if first you state df and pass to functions through pipe"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html#questions-challenges",
+    "href": "weekly-notes/week-01-notes.html#questions-challenges",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "Questions & Challenges",
+    "text": "Questions & Challenges\n\nWhy don’t you need to include df as argument when you are using piping syntax?"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-01-notes.html#connections-to-policy",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "Connections to Policy",
+    "text": "Connections to Policy\n\nGot a preview of policy topics we will cover over semester:\n\nhousing\nrecidivism\nbikeshare equity\n\nWhat sets this apart from stats is emphasis on prediction"
+  },
+  {
+    "objectID": "weekly-notes/week-01-notes.html#reflection",
+    "href": "weekly-notes/week-01-notes.html#reflection",
+    "title": "Week 1 Notes - Course Introduction",
+    "section": "Reflection",
+    "text": "Reflection\n\nHype for this course!\nPhillies &gt; Mets"
   }
 ]
