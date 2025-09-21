@@ -4,14 +4,14 @@
     "href": "weekly-notes/week-02-notes.html",
     "title": "Week 2 Notes",
     "section": "",
-    "text": "Main concepts:\nTechnical skills covered:"
+    "text": "Main concepts:\n\nBest practices for coding in R\nWhat are algorithms\nCensus data foundations\nData Analytics are Subjective\n\nTechnical skills covered:\n\ndplyr basics practice\ntidycensus"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#key-concepts-learned",
     "href": "weekly-notes/week-02-notes.html#key-concepts-learned",
     "title": "Week 2 Notes",
     "section": "",
-    "text": "Main concepts:\nTechnical skills covered:"
+    "text": "Main concepts:\n\nBest practices for coding in R\nWhat are algorithms\nCensus data foundations\nData Analytics are Subjective\n\nTechnical skills covered:\n\ndplyr basics practice\ntidycensus"
   },
   {
     "objectID": "weekly-notes/week-02-notes.html#coding-techniques",
@@ -278,5 +278,12 @@
     "title": "Lab 0: Getting Started with dplyr",
     "section": "5.2 Categorical Summaries",
     "text": "5.2 Categorical Summaries\n\n# Frequency table for price categories\ncar_data %&gt;% \n  group_by(price_category) %&gt;%\n  summarise(frequency = n())\n\n# A tibble: 3 × 2\n  price_category frequency\n  &lt;chr&gt;              &lt;int&gt;\n1 budget             34040\n2 luxury              6179\n3 midrange            9781"
+  },
+  {
+    "objectID": "weekly-notes/week-02-notes.html#notes",
+    "href": "weekly-notes/week-02-notes.html#notes",
+    "title": "Week 2 Notes",
+    "section": "Notes",
+    "text": "Notes\n\nCopying labs from MUSA repo to portfolio repo\n\ntemplate goes to scripts folder, data goes to data folder\n\n\n\nLab0 / General workflow in R\n\nWant to avoid “hoarding” tibbles, try not to create a new tibble for every operation\nMay way to read in data and store as a ‘pristine’ version, but then create a working version\nUse piping to string together operations, no need to store in-between temporary tibbles\n\n\n\nAlgorithmic Decision-Making & Census Data\n\nAlgorithms = set of instructions for solving a problem/completing a task\nAlgorithmic decision-making in government\n\nSystems used to assist or replace human decision-making (humans may be inefficient, flawed/biased)\nDecisions are made based on predictions from models that process historical data relevant to the decision-making process:\n\nInputs = features = predictors = independent variables = x\nOutputs = labels - outcome = dependent variable = y\n\nExamples:\n\nRecidivism risk for bail and sentencing decisions\nMortgage lending and tenant screening\npatient care prioritization and health care resource allocation\n\n\nClarifying terms:\n\nData science -&gt; engineering, algorithms, and methods\nData analytic -&gt;applying data science to other disciplines\nMachine Learning -&gt; algorithms for classification and prediction/regression\nAI -&gt; Algorithms that adjust and improve across iterations (neural networks, deep learning)\n\nGov’t data collection historically\n\ncivic registrations systems\ncensus data\nadministration records\noperations research – post-WWII efforts to determine things like the best place for hospitals etc\n\nNew data sources\n\nMore data available from both official and ‘unofficial’ or ‘accidental’ sources like Instagram\nTurn from explanation to prediction\nMessier data\n\nWhy use algos in gov’t?\n\nEfficiency - process more cases faster\nConsistency - same process applied equally (In theory)\nObjectivity - remove human bias\nCost-saving - remove costly human labors\n\nBig But – Data Analytics are Subjective\n\nAt every step, there are human choices:\n\nData cleaning decisions\nRecoding/classification\nData collection biases\nImperfect proxies\nInterpreting results\nWhat variables you include in your model\n\n\nExample - Healthcare Algorithm Bias\n\nAlgorithm to identify high-risk patients systematically discriminated against Black patients, why?\n\nAlgo used healthcare cost as a proxy for need (high cost = more risk, less cost = low risk)\nProblem: black patients incur lower costs because of exclusion from health care and unequal access\n\nResult: Black patients were systematically not prioritized\n\nExample - COMPAS Recidivism Prediction\n\nAlgo flagged 2x as likely Black defendants as White as high risk of reoffending, why?\n\nData came from pigs\n\n\nExample - Dutch Welfare Fraud Detection\n\nAlgo disproportionately targeted vulnerable populations\n\n\n\n\nScenario\n\nAutomated traffic enforcements\n\nHighest traffic volume + Mots crashes as proxy for places needing more traffic enforcement\nBlind spot -&gt; unreported crashes (folks avoiding insurance fees for instance)\nHarm -&gt; Could under-enforce actually dangerous intersections, otherwise could be over-enforcement in over-policed areas\nSafeguard -&gt; Cap disparities across areas\n\n\n\n\nCensus Data Foundations\n\nDecennial census mandated by constitution for allocating representative governments\n\nOnly 9 questions on 10y census – age, race, sex, housing\n\nACS\n\n3% of households surveyed annually\nDetailed questions\n\n2020 Innovation: Differential Privacy\n\nadded noise to protect privacy, but this leads to weird edge cases like people living under water\n\nAccessing Census Dat ain R\n\ntidycensus !!! hooray\n\nStructure:\n\nData organized in tables\nEach table has multiple variables\n\n……E = estimate variable\n…..M = MOE variable\n\n\nRule of thumb\n\nLarge MOE : estimate means less reliable\nSmall MOE : estimate means more reliable\n\nTIGER/Line Files\n\nGeographic shape data not automatically included in ACS tables, need to add on\nNow released as shapefiles\n\nTwo types of census outputs:\n\nWide\n\nColumns: Tract, Variable_1, Variable_2…\ni.e. One row per tract\n\nLong\n\nColumns: Tract, Var, Value\ni.e. Tract * variable number of rows"
   }
 ]

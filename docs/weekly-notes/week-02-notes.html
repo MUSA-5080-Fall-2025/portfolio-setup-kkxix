@@ -115,6 +115,21 @@ ul.task-list li input[type="checkbox"] {
   </li>  
     </ul>
   </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-labs" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Labs</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-labs">    
+        <li>
+    <a class="dropdown-item" href="../labs/">
+ <span class="dropdown-text">All labs</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../labs/lab0/scripts/lab0_template.html">
+ <span class="dropdown-text">Lab0</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -132,10 +147,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#key-concepts-learned" id="toc-key-concepts-learned" class="nav-link active" data-scroll-target="#key-concepts-learned">Key Concepts Learned</a></li>
-  <li><a href="#coding-techniques" id="toc-coding-techniques" class="nav-link" data-scroll-target="#coding-techniques">Coding Techniques</a></li>
-  <li><a href="#questions-challenges" id="toc-questions-challenges" class="nav-link" data-scroll-target="#questions-challenges">Questions &amp; Challenges</a></li>
-  <li><a href="#connections-to-policy" id="toc-connections-to-policy" class="nav-link" data-scroll-target="#connections-to-policy">Connections to Policy</a></li>
-  <li><a href="#reflection" id="toc-reflection" class="nav-link" data-scroll-target="#reflection">Reflection</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   </ul>
 </nav>
     </div>
@@ -170,23 +182,184 @@ ul.task-list li input[type="checkbox"] {
 <section id="key-concepts-learned" class="level2">
 <h2 class="anchored" data-anchor-id="key-concepts-learned">Key Concepts Learned</h2>
 <ul>
-<li>Main concepts:</li>
-<li>Technical skills covered:</li>
+<li>Main concepts:
+<ul>
+<li>Best practices for coding in R</li>
+<li>What are algorithms</li>
+<li>Census data foundations</li>
+<li>Data Analytics are Subjective</li>
+</ul></li>
+<li>Technical skills covered:
+<ul>
+<li>dplyr basics practice</li>
+<li>tidycensus</li>
+</ul></li>
 </ul>
 </section>
-<section id="coding-techniques" class="level2">
-<h2 class="anchored" data-anchor-id="coding-techniques">Coding Techniques</h2>
+<section id="notes" class="level2">
+<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<section id="copying-labs-from-musa-repo-to-portfolio-repo" class="level4">
+<h4 class="anchored" data-anchor-id="copying-labs-from-musa-repo-to-portfolio-repo">Copying labs from MUSA repo to portfolio repo</h4>
+<ul>
+<li>template goes to scripts folder, data goes to data folder</li>
+</ul>
 </section>
-<section id="questions-challenges" class="level2">
-<h2 class="anchored" data-anchor-id="questions-challenges">Questions &amp; Challenges</h2>
+<section id="lab0-general-workflow-in-r" class="level4">
+<h4 class="anchored" data-anchor-id="lab0-general-workflow-in-r">Lab0 / General workflow in R</h4>
+<ul>
+<li>Want to avoid “hoarding” tibbles, try not to create a new tibble for every operation</li>
+<li>May way to read in data and store as a ‘pristine’ version, but then create a working version</li>
+<li>Use piping to string together operations, no need to store in-between temporary tibbles</li>
+</ul>
 </section>
-<section id="connections-to-policy" class="level2">
-<h2 class="anchored" data-anchor-id="connections-to-policy">Connections to Policy</h2>
+<section id="algorithmic-decision-making-census-data" class="level4">
+<h4 class="anchored" data-anchor-id="algorithmic-decision-making-census-data">Algorithmic Decision-Making &amp; Census Data</h4>
+<ul>
+<li>Algorithms = set of instructions for solving a problem/completing a task</li>
+<li>Algorithmic decision-making in government
+<ul>
+<li>Systems used to assist or replace human decision-making (humans may be inefficient, flawed/biased)</li>
+<li>Decisions are made based on predictions from models that process historical data relevant to the decision-making process:
+<ul>
+<li>Inputs = features = predictors = independent variables = x</li>
+<li>Outputs = labels - outcome = dependent variable = y</li>
+</ul></li>
+<li>Examples:
+<ul>
+<li>Recidivism risk for bail and sentencing decisions</li>
+<li>Mortgage lending and tenant screening</li>
+<li>patient care prioritization and health care resource allocation</li>
+</ul></li>
+</ul></li>
+<li>Clarifying terms:
+<ul>
+<li>Data science -&gt; engineering, algorithms, and methods</li>
+<li>Data analytic -&gt;applying data science to other disciplines</li>
+<li>Machine Learning -&gt; algorithms for classification and prediction/regression</li>
+<li>AI -&gt; Algorithms that adjust and improve across iterations (neural networks, deep learning)</li>
+</ul></li>
+<li>Gov’t data collection historically
+<ul>
+<li>civic registrations systems</li>
+<li>census data</li>
+<li>administration records</li>
+<li>operations research – post-WWII efforts to determine things like the best place for hospitals etc</li>
+</ul></li>
+<li>New data sources
+<ul>
+<li>More data available from both official and ‘unofficial’ or ‘accidental’ sources like Instagram</li>
+<li>Turn from explanation to prediction</li>
+<li>Messier data</li>
+</ul></li>
+<li>Why use algos in gov’t?
+<ul>
+<li>Efficiency - process more cases faster</li>
+<li>Consistency - same process applied equally (In theory)</li>
+<li>Objectivity - remove human bias</li>
+<li>Cost-saving - remove costly human labors</li>
+</ul></li>
+<li>Big But – <strong>Data Analytics are Subjective</strong>
+<ul>
+<li>At every step, there are human choices:
+<ul>
+<li>Data cleaning decisions</li>
+<li>Recoding/classification</li>
+<li>Data collection biases</li>
+<li>Imperfect proxies</li>
+<li>Interpreting results</li>
+<li>What variables you include in your model</li>
+</ul></li>
+</ul></li>
+<li>Example - Healthcare Algorithm Bias
+<ul>
+<li>Algorithm to identify high-risk patients systematically discriminated against Black patients, why?
+<ul>
+<li>Algo used healthcare cost as a proxy for need (high cost = more risk, less cost = low risk)</li>
+<li>Problem: black patients incur lower costs because of exclusion from health care and unequal access</li>
+</ul></li>
+<li>Result: Black patients were systematically not prioritized</li>
+</ul></li>
+<li>Example - COMPAS Recidivism Prediction
+<ul>
+<li>Algo flagged 2x as likely Black defendants as White as high risk of reoffending, why?
+<ul>
+<li>Data came from pigs</li>
+</ul></li>
+</ul></li>
+<li>Example - Dutch Welfare Fraud Detection
+<ul>
+<li>Algo disproportionately targeted vulnerable populations</li>
+</ul></li>
+</ul>
 </section>
-<section id="reflection" class="level2">
-<h2 class="anchored" data-anchor-id="reflection">Reflection</h2>
+<section id="scenario" class="level4">
+<h4 class="anchored" data-anchor-id="scenario">Scenario</h4>
+<ul>
+<li>Automated traffic enforcements
+<ul>
+<li>Highest traffic volume + Mots crashes as proxy for places needing more traffic enforcement</li>
+<li>Blind spot -&gt; unreported crashes (folks avoiding insurance fees for instance)</li>
+<li>Harm -&gt; Could under-enforce actually dangerous intersections, otherwise could be over-enforcement in over-policed areas</li>
+<li>Safeguard -&gt; Cap disparities across areas</li>
+</ul></li>
+</ul>
+</section>
+<section id="census-data-foundations" class="level4">
+<h4 class="anchored" data-anchor-id="census-data-foundations">Census Data Foundations</h4>
+<ul>
+<li>Decennial census mandated by constitution for allocating representative governments
+<ul>
+<li>Only 9 questions on 10y census – age, race, sex, housing</li>
+</ul></li>
+<li>ACS
+<ul>
+<li>3% of households surveyed annually</li>
+<li>Detailed questions</li>
+</ul></li>
+<li>2020 Innovation: Differential Privacy
+<ul>
+<li>added noise to protect privacy, but this leads to weird edge cases like people living under water</li>
+</ul></li>
+<li>Accessing Census Dat ain R
+<ul>
+<li>tidycensus !!! hooray</li>
+</ul></li>
+<li>Structure:
+<ul>
+<li>Data organized in tables</li>
+<li>Each table has multiple variables
+<ul>
+<li>……E = estimate variable</li>
+<li>…..M = MOE variable</li>
+</ul></li>
+</ul></li>
+<li>Rule of thumb
+<ul>
+<li>Large MOE : estimate means less reliable</li>
+<li>Small MOE : estimate means more reliable</li>
+</ul></li>
+<li>TIGER/Line Files
+<ul>
+<li>Geographic shape data not automatically included in ACS tables, need to add on</li>
+<li>Now released as shapefiles</li>
+</ul></li>
+<li>Two types of census outputs:
+<ul>
+<li>Wide
+<ul>
+<li>Columns: Tract, Variable_1, Variable_2…</li>
+<li>i.e.&nbsp;One row per tract</li>
+</ul></li>
+<li>Long
+<ul>
+<li>Columns: Tract, Var, Value</li>
+<li>i.e.&nbsp;Tract * variable number of rows</li>
+</ul></li>
+</ul></li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
