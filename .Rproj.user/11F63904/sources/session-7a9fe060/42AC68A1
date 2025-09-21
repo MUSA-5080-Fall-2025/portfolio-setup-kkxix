@@ -1,19 +1,19 @@
 {
-    "id": "1CC3A57B",
+    "id": "42AC68A1",
     "path": "~/musa-5080/portfolio-setup-kkxix/labs/lab0/scripts/lab0_template.qmd",
     "project_path": "labs/lab0/scripts/lab0_template.qmd",
     "type": "quarto_markdown",
-    "hash": "420357353",
+    "hash": "0",
     "contents": "",
     "dirty": false,
-    "created": 1758482509429.0,
+    "created": 1758483866059.0,
     "source_on_save": false,
-    "relative_order": 2,
+    "relative_order": 5,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "102,0",
-        "scrollLine": "101",
+        "cursorPosition": "54,14",
+        "scrollLine": "52",
         "last_setup_crc32": "930c3a25d06fb786"
     },
     "folds": "",
@@ -21,7 +21,7 @@
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1758482512739,
+    "last_content_update": 1757951324,
     "read_only": false,
     "read_only_alternatives": []
 }
