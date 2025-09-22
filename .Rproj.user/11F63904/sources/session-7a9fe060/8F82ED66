@@ -3,7 +3,7 @@
     "path": "~/musa-5080/portfolio-setup-kkxix/_quarto.yml",
     "project_path": "_quarto.yml",
     "type": "yaml",
-    "hash": "1123439535",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1758482722999.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "26,18",
+        "cursorPosition": "19,25",
         "scrollLine": "8"
     },
     "folds": "",
-    "lastKnownWriteTime": 1758483824,
+    "lastKnownWriteTime": 1758554519,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1758483824956,
+    "last_content_update": 1758554519532,
     "read_only": false,
     "read_only_alternatives": []
 }

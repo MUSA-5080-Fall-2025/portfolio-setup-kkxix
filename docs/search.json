@@ -509,5 +509,54 @@
     "title": "Assignment 1: Census Data Quality for Policy Decisions",
     "section": "Submission Checklist",
     "text": "Submission Checklist\nBefore submitting your portfolio link on Canvas:\n\nAll code chunks run without errors\nAll “[Fill this in]” prompts have been completed\nTables are properly formatted and readable\nExecutive summary addresses all four required components\nPortfolio navigation includes this assignment\nCensus API key is properly set\nDocument renders correctly to HTML\n\nRemember: Submit your portfolio URL on Canvas, not the file itself. Your assignment should be accessible at your-portfolio-url/assignments/assignment_1/your_file_name.html"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html",
+    "href": "weekly-notes/week-03-notes.html",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "",
+    "text": "Main concepts:\nTechnical skills covered"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#key-concepts-learned",
+    "href": "weekly-notes/week-03-notes.html#key-concepts-learned",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "",
+    "text": "Main concepts:\nTechnical skills covered"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#notes",
+    "href": "weekly-notes/week-03-notes.html#notes",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "Notes",
+    "text": "Notes\n\nData Vizualisation\n\nAnscombe’s Quartet\n\nJust looking at summary can hide important details about trends in the data – all 4 graphs have the same variancesk, same correlation, and same regression line … wouldn’t realize how different they are unless looking at the graph\nPolicy Implications - policy decisions made based on misunderstood data\n\n73% of planners don’t warn user about data unreliability – violating ethics arguably\n\nCommon problems in data presentation:\n\nmisleading scales, cherry-picking, missing context\nhiding uncertainty (not communicating MOEs) – verrrryyyyyyy tempting to use census block groups with ACS5 because you can … but moes can be quite high at this level\n\n\n\n\n\nggplot2 Philosophy\n\nData -&gt; Aesthetics -&gt; Geometries -&gt; Visual\n\nData = dataset, df or tibble\nAesthetics = what variables map to visual properties\nGeometries = how to display the data (as points? bars? lines?) and how to decorate/stylize\nadditional layers = scales, themes, facets, annotations\n\nSyntax: -g &lt;- ggplot(data = acs_data) = “I would like to make this plot” … if after running this code you ran g, you would just get a black canvas in viewer\n\nAdding aesthetics: g &lt;- ggplot(data = acs_data) + aes(x=income, y=%_bachelor)\nAdding geometries: g &lt;- ggplot(...) + aes(...) + geom_points(decorate...colors...size...)"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#coding-techniques",
+    "href": "weekly-notes/week-03-notes.html#coding-techniques",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "Coding Techniques",
+    "text": "Coding Techniques"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#questions-challenges",
+    "href": "weekly-notes/week-03-notes.html#questions-challenges",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "Questions & Challenges",
+    "text": "Questions & Challenges"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#connections-to-policy",
+    "href": "weekly-notes/week-03-notes.html#connections-to-policy",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "Connections to Policy",
+    "text": "Connections to Policy"
+  },
+  {
+    "objectID": "weekly-notes/week-03-notes.html#reflection",
+    "href": "weekly-notes/week-03-notes.html#reflection",
+    "title": "Week 3 Notes - Course Introduction",
+    "section": "Reflection",
+    "text": "Reflection"
   }
 ]

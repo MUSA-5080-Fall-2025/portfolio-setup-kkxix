@@ -1,0 +1,64 @@
+---
+title: "Week 3 Notes - Course Introduction"
+date: "2025-09-22"
+---
+
+## Key Concepts Learned
+- Main concepts: 
+- Technical skills covered:
+
+## Notes
+
+#### Data Visualization
+
+- Anscombe's Quartet 
+  - Just looking at summary can hide important details about trends in the data -- all 4 graphs have the same variances, same correlation, and same regression line ... wouldn't realize how different they are unless looking at the graph 
+  - **Policy Implications** - policy decisions made based on misunderstood data
+- 73% of planners don't warn user about data unreliability -- violating ethics arguably 
+  - Common problems in data presentation:
+    - misleading scales, cherry-picking, missing context
+    - **hiding uncertainty** (not communicating MOEs) -- verrrryyyyyyy tempting to use census block groups with ACS5 because you can ... but MOEs can be quite high at this level
+
+#### ggplot2 Philosophy
+
+- Data -> Aesthetics -> Geometries -> Visual 
+  - Data = dataset, df or tibble
+  - Aesthetics = what variables map to visual properties 
+  - Geometries = how to display the data (as points? bars? lines?) and how to decorate/stylize 
+  - additional layers = scales, themes, facets, annotations
+- Syntax: 
+  -```g <- ggplot(data = acs_data)``` = "I would like to make this plot" ... if after running this code you ran ```g```, you would just get a black canvas in viewer 
+  - Adding aesthetics: ```g <- ggplot(data = acs_data) + aes(x=income, y=%_bachelor)```
+  - Adding geometries: ```g <- ggplot(...) + aes(...) + geom_points(decorate...colors...size...)```
+  
+#### EDA Mindset
+
+- EDA = Exploratory Data Analysis ... take the time to get to know your data 
+  - Load and inspect -- dimensions, variables types, missing data 
+  - Assess reliability -- examine MOEs and calculate coeffs of variation
+  - visualize distributions ... 
+- First steps:
+  - Histogram -- distribution of data 
+  - Box plot -- finding outliers
+
+#### Joining tables 
+
+- Left join -- preserves 'left' tables all ids from identifying category, add data from 'right' table based on identifying category but will skip mismatched ids
+	- right join is silly...just use left join and switch order
+- Full join -- combined all ids from each tables' id category
+- Inner Join -- only retain matching ids from each table
+- Can join if columns have different names as long as they have matching values, *but matching fields must have same data type*
+  
+## Coding Techniques
+
+- Good pattern for finding census variables :
+	- ```filter(str_detect(field, "str"))```
+	- ```acs_vars_2022 <- load_variables(2022, "acs5", cache = TRUE)```
+	- in the load variables table, "concept" column corresponds to tables 
+
+
+## Questions & Challenges
+
+## Connections to Policy
+
+## Reflection
