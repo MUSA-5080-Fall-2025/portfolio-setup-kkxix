@@ -84,7 +84,9 @@ my_state <- 'Michigan'
 # Write your get_acs() code here
 mi_county_pop_income <- get_acs(
   geography = "county", 
-  variables = c(median_household_income = "B19013_001",total_pop = "B01003_001"),
+  variables = c(
+    median_household_income = "B19013_001",
+    total_pop = "B01003_001"),
   state = "MI",
   year = 2022,
   output= "wide",
@@ -93,7 +95,7 @@ mi_county_pop_income <- get_acs(
 # Clean the county names to remove state name and "County" 
 # Hint: use mutate() with str_remove()
 mi_county_pop_income <- mi_county_pop_income %>% 
-  mutate(NAME = str_remove(NAME, " County, Michigan"))
+  mutate(County_Name = str_remove(NAME, " County, Michigan")) 
 
 # Display the first few rows
 head(mi_county_pop_income)
@@ -157,15 +159,32 @@ income_reliability_summary <- mi_county_pop_income %>%
 ```{r high-uncertainty}
 # Create table of top 5 counties by MOE percentage
 top_5_unreliable <- mi_county_pop_income %>%
-  arrange(desc(income_moe_percent))
+  arrange(desc(income_moe_percent)) %>%
+  top_n(5, income_moe_percent) %>%
+  select(NAME, median_household_incomeE, median_household_incomeM, income_moe_percent, income_e_reliability)
   
 
 # Format as table with kable() - include appropriate column names and caption
+top_5_unreliable_formatted <- top_5_unreliable %>%
+  mutate(
+    median_household_incomeE = paste0("$", format(median_household_incomeE, big.mark = ",", scientific = FALSE)),
+    median_household_incomeM = paste0("±", "$", format(median_household_incomeM, big.mark = ",", scientific = FALSE)),
+    income_moe_percent = paste0(round(income_moe_percent, 2), "%"),
+  )
+
+  kable(top_5_unreliable_formatted,
+      col.names = c("County Name", "Median Income", "MOE", "MOE Percent of Estimate", "Reliability of Estimate"),
+      align = "l",
+      caption = "5 Least Reliable Median Income Estimates of Counties in Michigan",
+      digits = 2,
+      format.args = list(big.mark = ",", scientific = FALSE))
 ```
 
 **Data Quality Commentary:**
 
 [Write 2-3 sentences explaining what these results mean for algorithmic decision-making. Consider: Which counties might be poorly served by algorithms that rely on this income data? What factors might contribute to higher uncertainty?]
+
+Assistance programs and policies aimed at community development may look at median income to identify priority areas. Areas with lower reliability may have a far lower or higher actual median income than what is reported in the census, and could affect the calculations of how resources are allocated to those areas. Additionally, higher unreliability is more likely in less population geographies because it is harder to get a representative sample, so smaller or less densely populated geographies, which are already often economically vulnerable, may be further marginalized by being overlooked in the prioritization of assistance programs based on these metrics.  
 
 # Part 3: Neighborhood-Level Analysis
 
@@ -176,14 +195,33 @@ top_5_unreliable <- mi_county_pop_income %>%
 **Strategy:** Choose counties that represent different reliability levels (e.g., 1 high confidence, 1 moderate, 1 low confidence) to compare how data quality varies.
 
 ```{r select-counties}
+counties <- c("Kalamazoo", "Crawford", "Keweenaw")
+
 # Use filter() to select 2-3 counties from your county_reliability data
 # Store the selected counties in a variable called selected_counties
+selected_counties <- filter(mi_county_pop_income, NAME %in% counties)
 
 # Display the selected counties with their key characteristics
 # Show: county name, median income, MOE percentage, reliability category
+selected_counties %>%
+  select(NAME, median_household_incomeE, income_moe_percent, income_e_reliability) %>%
+  mutate(
+    median_household_incomeE = paste0("$", format(median_household_incomeE, big.mark = ",", scientific = FALSE)),
+    income_moe_percent = paste0(round(income_moe_percent, 2), "%"),
+  ) %>%
+kable(col.names = c("County Name", "Median Income", "MOE Percent of Estimate", "Reliability of Estimate"),
+      align = "l",
+      caption = "3 Selected Counties in Michigan",
+      digits = 2,
+      format.args = list(big.mark = ",", scientific = FALSE))
 ```
 
-**Comment on the output:** [write something :)]
+**Comment on the output:**
+I chose: 
+
+- Kalamazoo as a high reliable county and a relatively bigger city in Western Michigan with multiple universities. 
+- Crawford is a moderate reliable county and where I used to go fishing with my grandpa :)
+- Keweenaw is a low reliable county in the most northern tip of the upper penninsula with a very small population (I didn't know anyone even lived there)
 
 ## 3.2 Tract-Level Demographics
 
@@ -201,11 +239,34 @@ top_5_unreliable <- mi_county_pop_income %>%
 
 # Use get_acs() to retrieve tract-level data
 # Hint: You may need to specify county codes in the county parameter
+demographics <- get_acs(
+  geography = "tract",
+  variables = c(White = "B03002_003", Black = "B03002_004", Latinx = "B03002_012", Total = "B03002_001"),
+  state = "MI", 
+  county = counties,
+  year = 2022,
+  output="wide"
+)
 
 # Calculate percentage of each group using mutate()
 # Create percentages for white, Black, and Hispanic populations
+demographics <- demographics %>%
+  mutate(percent_black = if_else(TotalE == 0, 0, BlackE / TotalE * 100),
+         percent_white = if_else(TotalE == 0, 0, WhiteE / TotalE * 100),
+         percent_latin = if_else(TotalE == 0, 0, LatinxE / TotalE * 100) 
+  )%>%
+  mutate(percent_black_c = paste0(round(percent_black, 2), "%"),
+         percent_white_c = paste0(round(percent_white), "%"),
+         percent_latin_c = paste0(round(percent_latin, 2), "%")
+  )
 
 # Add readable tract and county name columns using str_extract() or similar
+demographics <- demographics %>%
+  mutate(
+    County_Name = str_extract(NAME, "(?<=;\\s)[A-Za-z ]+(?=\\sCounty;)"),
+    Tract = str_extract(NAME, "(?<=Census Tract )[0-9.]+")
+  )
+  
 ```
 
 ## 3.3 Demographic Analysis
@@ -215,11 +276,34 @@ top_5_unreliable <- mi_county_pop_income %>%
 ```{r demographic-analysis}
 # Find the tract with the highest percentage of Hispanic/Latino residents
 # Hint: use arrange() and slice() to get the top tract
+demographics %>% 
+  filter(!is.nan(percent_latin)) %>%
+  arrange(desc(percent_latin)) %>% 
+  slice(1) %>%
+  select(County_Name, Tract, percent_latin_c) %>%
+  kable(col.names = c("County", "Tract", "Percent Latin"),
+        align = "c")
+```
+
+```{r demographic-analysis-2}
 
 # Calculate average demographics by county using group_by() and summarize()
 # Show: number of tracts, average percentage for each racial/ethnic group
+avg_demo_by_tract <- demographics %>%
+  group_by(County_Name) %>%
+  summarize(avg_black = mean(percent_black),
+            avg_white = mean(percent_white),
+            avg_latin = mean(percent_latin))
 
 # Create a nicely formatted table of your results using kable()
+avg_demo_by_tract %>%
+  mutate(avg_black_c = paste0(round(avg_black, 2), "%"),
+         avg_white_c = paste0(round(avg_white, 2), "%"),
+         avg_latin_c = paste0(round(avg_latin, 2), "%")) %>%
+  select(County_Name, avg_black_c, avg_white_c, avg_latin_c) %>% 
+  kable(col.names = c("County  |", "Avg % Black  |", "Avg % White  |", "Avg % Latin  |"),
+        caption = "Average Demographic Makeup of All Census Tracts in 3 MI Counties",
+        align = "r")
 ```
 
 # Part 4: Comprehensive Data Quality Evaluation
