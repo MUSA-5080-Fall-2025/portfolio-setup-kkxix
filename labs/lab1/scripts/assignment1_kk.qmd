@@ -438,9 +438,9 @@ Given that there was not a single tract in the three counties where all three ra
 
 **Executive Summary:**
 
-Accross the data I analyzed, the clearest pattern that emerged is that the heterogenous a tract, the more unreliable the estimates. We also see that this unreliability is not evenly shared, but whatever population is in the minority faces more unreliable estimates, leading to a sort of double marginalization. 
+Accross the data I analyzed, the clearest pattern that emerged is that the more homogenous a tract, the more unreliable the estimates. We also see that this unreliability is not evenly shared, but whatever population is in the minority faces more unreliable estimates, leading to a sort of double marginalization, where an already marginalized population is less accurately represented in data, and decisions made on these data could be very misguided.  
 
-In Michigan, Black and Latinx populations face the greatest risk of algorithmic bias, even in a county that is relatively diverse, like Kalamazoo, any given tract might have a much higher White majority. 
+In Michigan, Black and Latinx populations face the greatest risk of algorithmic bias, even in a county that is relatively diverse, like Kalamazoo, any given tract might have a much higher White majority and unreliable estimates of Black and Latinx populations. 
 
 The underlying issues that could be at play here are that when attaining a survey sample especially in a census tract with a relatively low population and very low diversity, there might be a handful of people of the demographic the census is trying to estimate the size of, causing issues in extrapolating from the sample to the overall makeup of the tract and the county. In Michigan specifically, the state is about 3/4 White, and there is a history of racialized segregration of living areas that persists today, so even in diverse areas, any given tract might have high unreliability because of a more homogenous makeup. 
 
@@ -595,7 +595,7 @@ How racially segregated are census tracts in Michigan in general -- i.e. how man
 **Data Sources:** 
 
 - U.S. Census Bureau, American Community Survey 2018-2022 5-Year Estimates
-- Retrieved via tidycensus R package on [date]
+- Retrieved via tidycensus R package on Sep. 28, 2025
 
 **Reproducibility:** 
 

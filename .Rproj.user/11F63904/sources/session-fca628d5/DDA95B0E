@@ -3,7 +3,7 @@
     "path": "~/musa-5080/portfolio-setup-kkxix/labs/lab1/scripts/assignment1_kk.qmd",
     "project_path": "labs/lab1/scripts/assignment1_kk.qmd",
     "type": "quarto_markdown",
-    "hash": "1788189381",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1758929423459.0,
@@ -12,16 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "488,0",
-        "scrollLine": "482",
+        "cursorPosition": "440,453",
+        "scrollLine": "424",
         "last_setup_crc32": "fca628d5e61ea6cb"
     },
     "folds": "",
-    "lastKnownWriteTime": 1759113485,
+    "lastKnownWriteTime": 1759113872,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1759113485864,
+    "last_content_update": 1759113872910,
     "read_only": false,
     "read_only_alternatives": []
 }
