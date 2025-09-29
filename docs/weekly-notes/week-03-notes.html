@@ -202,17 +202,17 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="key-concepts-learned">Key Concepts Learned</h2>
 <ul>
 <li>Main concepts:</li>
-<li>Technical skills covered</li>
+<li>Technical skills covered:</li>
 </ul>
 </section>
 <section id="notes" class="level2">
 <h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<section id="data-vizualisation" class="level4">
-<h4 class="anchored" data-anchor-id="data-vizualisation">Data Vizualisation</h4>
+<section id="data-visualization" class="level4">
+<h4 class="anchored" data-anchor-id="data-visualization">Data Visualization</h4>
 <ul>
 <li>Anscombe’s Quartet
 <ul>
-<li>Just looking at summary can hide important details about trends in the data – all 4 graphs have the same variancesk, same correlation, and same regression line … wouldn’t realize how different they are unless looking at the graph</li>
+<li>Just looking at summary can hide important details about trends in the data – all 4 graphs have the same variances, same correlation, and same regression line … wouldn’t realize how different they are unless looking at the graph</li>
 <li><strong>Policy Implications</strong> - policy decisions made based on misunderstood data</li>
 </ul></li>
 <li>73% of planners don’t warn user about data unreliability – violating ethics arguably
@@ -220,7 +220,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Common problems in data presentation:
 <ul>
 <li>misleading scales, cherry-picking, missing context</li>
-<li><strong>hiding uncertainty</strong> (not communicating MOEs) – verrrryyyyyyy tempting to use census block groups with ACS5 because you can … but moes can be quite high at this level</li>
+<li><strong>hiding uncertainty</strong> (not communicating MOEs) – verrrryyyyyyy tempting to use census block groups with ACS5 because you can … but MOEs can be quite high at this level</li>
 </ul></li>
 </ul></li>
 </ul>
@@ -242,9 +242,45 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 </ul>
 </section>
+<section id="eda-mindset" class="level4">
+<h4 class="anchored" data-anchor-id="eda-mindset">EDA Mindset</h4>
+<ul>
+<li>EDA = Exploratory Data Analysis … take the time to get to know your data
+<ul>
+<li>Load and inspect – dimensions, variables types, missing data</li>
+<li>Assess reliability – examine MOEs and calculate coeffs of variation</li>
+<li>visualize distributions …</li>
+</ul></li>
+<li>First steps:
+<ul>
+<li>Histogram – distribution of data</li>
+<li>Box plot – finding outliers</li>
+</ul></li>
+</ul>
+</section>
+<section id="joining-tables" class="level4">
+<h4 class="anchored" data-anchor-id="joining-tables">Joining tables</h4>
+<ul>
+<li>Left join – preserves ‘left’ tables all ids from identifying category, add data from ‘right’ table based on identifying category but will skip mismatched ids
+<ul>
+<li>right join is silly…just use left join and switch order</li>
+</ul></li>
+<li>Full join – combined all ids from each tables’ id category</li>
+<li>Inner Join – only retain matching ids from each table</li>
+<li>Can join if columns have different names as long as they have matching values, <em>but matching fields must have same data type</em></li>
+</ul>
+</section>
 </section>
 <section id="coding-techniques" class="level2">
 <h2 class="anchored" data-anchor-id="coding-techniques">Coding Techniques</h2>
+<ul>
+<li>Good pattern for finding census variables :
+<ul>
+<li><code>filter(str_detect(field, "str"))</code></li>
+<li><code>acs_vars_2022 &lt;- load_variables(2022, "acs5", cache = TRUE)</code></li>
+<li>in the load variables table, “concept” column corresponds to tables</li>
+</ul></li>
+</ul>
 </section>
 <section id="questions-challenges" class="level2">
 <h2 class="anchored" data-anchor-id="questions-challenges">Questions &amp; Challenges</h2>
