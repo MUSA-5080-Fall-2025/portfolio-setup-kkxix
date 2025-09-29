@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "week-03-notes.qmd",
+                "file": "week-04-notes.qmd",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "week-03-notes"
+              "title": "week-04-notes"
             }
           }
         ]
@@ -169,8 +169,21 @@
   },
   "active": "828cab7589e04a22",
   "lastOpenFiles": [
+    "week-04-notes.html",
+    "week-04-notes_files/mediabag",
+    "week-04-notes_files",
+    "week-04-notes.rmarkdown",
+    "Pasted image 20250929124318.png",
+    "Pasted image 20250929124013.png",
     "week-03-notes.html",
     "week-03-notes_files/mediabag",
-    "week-03-notes_files"
+    "week-03-notes_files",
+    "Pasted image 20250929123519.png",
+    "Pasted image 20250929123417.png",
+    "Pasted image 20250929123131.png",
+    "Pasted image 20250929122146.png",
+    "Pasted image 20250929121053.png",
+    "week-03-notes.qmd",
+    "week-04-notes.qmd"
   ]
 }

@@ -1,0 +1,160 @@
+---
+title: Week 4 Notes
+date: 2025-09-29
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Notes
+
+#### WHY use Spatial Analysis
+
+-   WHERE are these patterns occurring matters
+    -   Geographic clustering of problems
+    -   Spatial relationships between communities
+    -   Access to services and resources is often based on geography
+
+#### Spatial Data Fundamentals
+
+-   Two families of representing world 2-dimensionally
+    -   Vector
+        -   discrete objects -- things that have definite boundaries
+    -   Raster
+        -   Pixels
+        -   Continuous data
+
+**Vector Data Representation** - Three basic types of geometric
+representations - points - lines - polygons - (kinda like illustrator)
+
+**Common Spatial Data File Formats** - Shapefile - Developed by ESRI -
+Three fundamental objects (need all three to render accurately): -
+`.shp` - stores info about the geometry - `.shx` - shape index -
+`.dbf` - names of things - Integrates with tidyverse, follows
+inernational standards - GeoJSON - All one file ! Little more - KML -
+Google Earth - Database connections (PostGIS)
+
+**Simple Features** - Multi-shapes -- like a broken bridge -- think
+multiple shapes for one row of a table - Think Hawaii - -multiple shapes
+that are all "Hawaii"
+
+TidyCensus gives you characteristics but no shapes, tigris gives you
+shapes but no characteristics -- must combine
+
+**Important syntax:**
+
+-   ==ggplot geom for mapping: `geom_sf()`==
+-   ==ggplot use `theme_void()` to get rid of graph backdrop==
+-   ==`st_filter()` is like `filter()` but for spatial filtering rather
+    than simple df\`
+-   `st_union()` works like arcgis "dissolve"
+
+**Spatial Subsetting:** - preserves original shapes, not for doing
+something like finding part of a county. Rather for doing things like
+finding a county within a list of counties, or all counties that touch a
+specific county
+
+`neighbors <- pa_counties %>%   st_filter(allegheny, .predicate = st_touches)`
+
+-   In this example, the terminology "st_touches" is common across all
+    GIS
+-   `.predicate` tells `st_filter()` what kind of relationship to look
+    for, if nothing specified, then `st_intersect` is default
+
+**cheat sheet:**
+
+![cheat-sheet](Pasted%20image%2020250929121053.png)
+
+#### Coordinate Reference System (CRS)
+
+-   basic problem : world is round, maps are flat, projecting from 3d to
+    2d will necessarily cause some kind of distortion
+-   Earth is also not perfectly round, but a geoid ( a lil bumpy ), but
+    geoid is mathematically inconvenient, so the **Step 1** in
+    projection is we project from he geoid to an ==ellipsoid==, which
+    doesn't perfectly represent the geoid, but good enough, and smooth
+    -   This means there are multiple ellipsoids that fit the earth, and
+        might fit certain areas better than others
+
+![crs](Pasted%20image%2020250929122146.png)
+
+-   **Step 2** -- tie the ellipsoid to the real earth to create a
+    **Geographic (Geodetic) Coordinate System** i.e. Lat Longs
+    -   Clark, 1866, uses 'flattening' to make a nice lil ellipsoid that
+        is particularly well-fitted to North America -- Meades Ranch,
+        Kansas, is where the ellipsoid and geoid smooch :-\*
+    -   ==North American Datum 1927== or ==NAD27==
+    -   Progress made, made a better ellipsoid than Clarke ("We're not
+        in Kansas anymore"), based on Earth Center instead of NA.. this
+        one called ==GRS80==
+    -   ==WGS84== -- yet another used by GPS systems
+-   **Step 3** -- take the 3d ellipsoid points and project onto 2d
+    surface
+    -   Cylindrical Projections
+
+![cylindical-projections](Pasted%20image%2020250929123131.png)
+
+```         
+    -   Line of tangency -- where the ellipsoid and the projected
+        surface smooch, all other locations will be distorted
+    -   Mercator is prime example
+    -   Bad at preserving sizes of things on 2d surface, but good at
+        preserving angles
+-   Transverse Cylindrical Projection
+    -   Good at preserving up and down (good for Chile, for example)
+    
+```
+
+![transverse](Pasted%20image%2020250929123417.png)
+
+```         
+-   Conical Projection
+    -   Good for areas concentrated in a segment of the ellipsoid,
+        like North America
+        
+```
+
+![conical](Pasted%20image%2020250929123519.png)
+
+```         
+-   Projected Coordinate System
+    -   Localized coordinate system built on a regular,
+        non-distorted grid
+    -   ==UTM== --
+```
+
+![UTM](Pasted%20image%2020250929124013.png)
+
+```         
+        -   Need to know what zone you are in -- all numbers are
+            based on grid system originating in the lower left
+            corner of the zone
+        -   No negatives
+        -   Who uses UTM ? depends on state -- if looking at a long
+            skinny area like Idaho for example
+    -   ==State Plane== (SPC)
+        -   Used in PA - Two state plane grids in PA, North and
+            South
+```
+
+![state-plane](Pasted%20image%2020250929124318.png)
+
+```         
+        -   Some states use Feet, others use Meters -- make sure to
+            check !
+-   SADD -- can't have all 4 in a projection
+    -   Shape
+    -   Area
+    -   Distance
+    -   Direction
+```
+
+-   `st_crs()` to check CRS for a dataset
+-   `st_set_crs(data, ####)` -- set CRS -- ONLY IF CRS MISSING, do NOT
+    use to transform CRS (path of despair) -- this will not change the
+    numbers themselves but rather how the computer interprets the
+    numbers, only use if `st_crs()` returns `<unknown>`
+-   `st_transform()` -- this will actually recalculate the coordinates
+    from one CRS to another
+-   In arcGIS -- this is the like the difference between "define
+    projection" and "project"
