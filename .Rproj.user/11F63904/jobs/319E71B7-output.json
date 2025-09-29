@@ -89,3 +89,6 @@
 [1,"pandoc \n  to: html\n  output-file: assignment1_kk.html\n  standalone: true\n  title-prefix: Katie Knox - MUSA 5080 Portfolio\n  section-divs: true\n  html-math-method: mathjax\n  wrap: none\n  default-image-extension: png\n  toc: true\n  variables: {}\n  \nmetadata\n  document-css: false\n  link-citations: true\n  date-format: long\n  lang: en\n  theme: cosmo\n  title: 'Assignment 1: Census Data Quality for Policy Decisions'\n  subtitle: Evaluating Data Reliability for Algorithmic Decision-Making\n  author: Katherine (Katie) Knox\n  date: today\n  toc-location: left\n  \n"]
 [1,"Output created: ..\\..\\..\\docs\\labs\\lab1\\scripts\\assignment1_kk.html\n\nWatching files for changes\n"]
 [1,"GET: /labs/lab1/scripts/assignment1_kk.html\n"]
+[1,"pandoc \n  to: html\n  output-file: week-03-notes.html\n  standalone: true\n  title-prefix: Katie Knox - MUSA 5080 Portfolio\n  section-divs: true\n  html-math-method: mathjax\n  wrap: none\n  default-image-extension: png\n  toc: true\n  variables: {}\n  \nmetadata\n  document-css: false\n  link-citations: true\n  date-format: long\n  lang: en\n  theme: cosmo\n  title: Week 3 Notes - Course Introduction\n  date: '2025-09-22'\n  \n"]
+[1,"Output created: ..\\docs\\weekly-notes\\week-03-notes.html\n\nWatching files for changes\n"]
+[1,"GET: /weekly-notes/week-03-notes.html\n"]
