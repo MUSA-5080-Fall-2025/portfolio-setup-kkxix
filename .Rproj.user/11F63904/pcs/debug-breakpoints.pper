@@ -2,14 +2,14 @@
     "debugBreakpointsState": {
         "breakpoints": [
             {
-                "id": 0,
-                "path": "~/musa-5080/MUSA-5080-Fall-2025/lectures/week-04/scripts/Week4_lecture_codes.R",
-                "line_number": 81,
+                "id": 1,
+                "path": "~/cpln-501/Assignment2/cpln501_module2_intro_to_r_studio_script.R",
+                "line_number": 48,
                 "function_steps": "",
                 "function_name": "toplevel",
                 "state": 1,
                 "editor_state": 1,
-                "editor_line_number": 81,
+                "editor_line_number": 48,
                 "is_pending_debug_completion": false,
                 "needs_updated_steps": false,
                 "type": 1,

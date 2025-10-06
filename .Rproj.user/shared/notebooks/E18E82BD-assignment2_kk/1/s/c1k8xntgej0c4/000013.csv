@@ -1,0 +1,4 @@
+"0","# Filter for vulnerable tracts based on your criteria"
+"0","vulnerable_tracts <- census_tracts %>%"
+"0","  filter(median_incomeE < 42398 | (over_65E/total_popE) > .017)"
+"0",""
