@@ -20,8 +20,21 @@
               "icon": "lucide-file",
               "title": "week-05-notes"
             }
+          },
+          {
+            "id": "80c752e3f76439eb",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.9.14"
+              },
+              "icon": "lucide-book-up",
+              "title": "Release Notes 1.9.14"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -167,7 +180,7 @@
       "qmd-as-md-obsidian:Toggle Quarto Preview": false
     }
   },
-  "active": "fe0eb228e1421218",
+  "active": "80c752e3f76439eb",
   "lastOpenFiles": [
     "week-05-notes.html",
     "week-05-notes_files/mediabag",

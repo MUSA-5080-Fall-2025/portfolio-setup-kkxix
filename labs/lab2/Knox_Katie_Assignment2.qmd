@@ -1,0 +1,983 @@
+---
+title: "Assignment 2: Spatial Analysis and Visualization"
+subtitle: "Healthcare Access and Equity in Pennsylvania"
+author: "Katie Knox"
+date: "10-2-2025"
+format: 
+  html:
+    code-fold: false
+    toc: true
+    toc-location: left
+    theme: cosmo
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+## Assignment Overview
+
+**Learning Objectives:**
+
+- Apply spatial operations to answer policy-relevant research questions
+- Integrate census demographic data with spatial analysis
+- Create publication-quality visualizations and maps
+- Work with spatial data from multiple sources
+- Communicate findings effectively for policy audiences
+
+---
+
+## Part 1: Healthcare Access for Vulnerable Populations
+
+### Research Question
+
+**Which Pennsylvania counties have the highest proportion of vulnerable populations (elderly + low-income) living far from hospitals?**
+
+Your analysis should identify counties that should be priorities for healthcare investment and policy intervention.
+
+### Required Analysis Steps
+
+Complete the following analysis, documenting each step with code and brief explanations:
+
+#### Step 1: Data Collection (5 points)
+
+Load the required spatial data:
+
+- Pennsylvania county boundaries
+- Pennsylvania hospitals (from lecture data)
+- Pennsylvania census tracts
+
+**Your Task:**
+```{r}
+#| echo: false
+
+
+# Load required packages
+library(sf)
+library(tidyverse)
+library(ggplot2)
+library(tigris)
+library(tidycensus)
+library(patchwork)
+library(units)
+library(knitr)
+library(ggspatial)
+library(ggnewscale)
+library(kableExtra)
+
+census_api_key("42bf8a20a3df1def380f330cf7edad0dd5842ce6")
+```
+
+```{r}
+#| output: false
+
+# Load spatial data
+pa_counties <- st_read("data/Pennsylvania_County_Boundaries.shp")
+hospitals <- st_read("data/hospitals.geojson")
+census_tracts <- tracts(state = "PA", cb = TRUE)
+
+
+# Check that all data loaded correctly
+glimpse(pa_counties)
+glimpse(census_tracts)
+glimpse(hospitals)
+
+```
+```{r}
+census_tracts <- st_transform(census_tracts, st_crs(pa_counties))
+hospitals <- st_transform(hospitals, st_crs(pa_counties))
+
+
+# With ggplot2
+p1 <- ggplot(pa_counties) +
+  geom_sf() +
+  theme_void()
+
+p2 <- ggplot(census_tracts) +
+  geom_sf() +
+  theme_void()
+
+p3 <- ggplot(hospitals) +
+  geom_sf() +
+  theme_void()
+
+p1 | p2 | p3
+
+```
+
+**Questions to answer:**
+
+- How many hospitals are in your dataset?
+  - 223
+- How many census tracts?
+  - 3445
+- What coordinate reference system is each dataset in?
+  - I transformed hospitals and census tracts to PA counties CRS, which is WGS84. Before that, hospitals were also in WGS84, but census tracts were in NAD83. 
+
+---
+
+#### Step 2: Get Demographic Data 
+
+Use `tidycensus` to download tract-level demographic data for Pennsylvania.
+
+**Required variables:**
+
+- Total population
+- Median household income
+- Population 65 years and over (you may need to sum multiple age categories)
+
+**Your Task:**
+```{r}
+#| output: False
+
+# Get demographic data from ACS
+pa_tracts_data <- get_acs(
+  geography = "tract",
+  variables = c(
+    median_income = "B19013_001",
+    total_pop = "B01003_001",
+    over_65 = "B01001_020"  # Population 65 years and over
+  ),
+  state = "PA",
+  year = 2023,
+  output = "wide"
+)
+
+# Join to tract boundaries
+census_tracts <- census_tracts %>%
+  left_join(pa_tracts_data, by= "GEOID")
+
+summary(census_tracts)
+
+```
+
+**Questions to answer:**
+
+- What year of ACS data are you using?
+  - 2019-2023 5-year ACS data
+- How many tracts have missing income data?
+  - 65
+- What is the median income across all PA census tracts?
+  - $72,944
+
+
+---
+
+#### Step 3: Define Vulnerable Populations 
+
+Identify census tracts with vulnerable populations based on TWO criteria:
+
+1. Low median household income (choose an appropriate threshold)
+2. Significant elderly population (choose an appropriate threshold)
+
+**Your Task:**
+```{r}
+# Filter for vulnerable tracts based on your criteria
+vulnerable_tracts <- census_tracts %>%
+  filter(median_incomeE < 42398 | (over_65E/total_popE) > .017)
+
+```
+
+**Questions to answer:**
+
+- What income threshold did you choose and why?
+    - I looked at the [2023 poverty guidelines](https://www.pakeys.org/2023-annual-federal-poverty-guidelines/), the average household size in PA in 2023, which was 2.4, and then looked into eligibility for various programs, which is anywhere from 133% FPIG to 215%. I am going with vulnerable household is 215% or less of the 2-person household FPIG, or $42,398.
+- What elderly population threshold did you choose and why?
+    - In order to control for overall population size, instead of looking at the raw number of elderly, I looked at the over 65 as percent of total population. I defined vulnerable as any tract in the 75th percentile of elderly percent of tract population (1.7% or above).
+- How many tracts meet your vulnerability criteria?
+    - 1,145
+- What percentage of PA census tracts are considered vulnerable by your definition?
+    - 33.2% -- about a third. 
+
+---
+
+#### Step 4: Calculate Distance to Hospitals 
+
+For each vulnerable tract, calculate the distance to the nearest hospital.
+
+**Your Task:**
+```{r}
+#convert to Albers
+vulnerable_tracts <- st_transform(vulnerable_tracts, crs = 5070)
+hospitals <- st_transform(hospitals, crs = 5070)
+
+# Calculate distance from each tract centroid to nearest hospital
+tract_centroids <- st_centroid(vulnerable_tracts)
+nearest_hospital <- st_nearest_feature(tract_centroids, hospitals)
+
+vulnerable_tracts <- vulnerable_tracts %>%
+  mutate(nearest_hospital_geom = hospitals$geometry[nearest_hospital])
+
+vulnerable_tracts <- vulnerable_tracts %>%
+  mutate(distance_to_nearst_hospital = set_units(st_distance(tract_centroids, vulnerable_tracts$nearest_hospital_geom, by_element = TRUE), "mi"))
+
+summary(vulnerable_tracts$distance_to_nearst_hospital) 
+
+```
+
+**Requirements:**
+
+- Use an appropriate projected coordinate system for Pennsylvania
+- Calculate distances in miles
+- Explain why you chose your projection
+
+I chose Albers Conical Equal Area, NAD 83 projection based on [this PA document from 2011's](https://elibrary.dcnr.pa.gov/PDFProvider.ashx?action=PDFStream&docID=1743537&chksum=&revision=0&docName=ndards&nativeExt=pdf&PromptToSave=False&Size=152488&ViewerMode=2&overlay=0) recommendation. 
+
+**Questions to answer:**
+
+- What is the average distance to the nearest hospital for vulnerable tracts?
+    - 4.4 miles
+- What is the maximum distance?
+    - 29.8 miles
+- How many vulnerable tracts are more than 15 miles from the nearest hospital?
+    - 33
+
+---
+
+#### Step 5: Identify Underserved Areas 
+
+Define "underserved" as vulnerable tracts that are more than 15 miles from the nearest hospital.
+
+**Your Task:**
+```{r}
+#| output: false
+
+# Create underserved variable
+
+vulnerable_tracts <- vulnerable_tracts %>%
+  mutate(underserved = ifelse(as.numeric(distance_to_nearst_hospital) > 15,"Underserved",""))
+
+vulnerable_tracts %>%
+  group_by(underserved)%>%
+  summarise(n())
+
+```
+
+**Questions to answer:**
+
+- How many tracts are under-served?
+    - 33
+- What percentage of vulnerable tracts are under-served?
+    - 3%
+- Does this surprise you? Why or why not?
+    - Unfortunately, this does not surprise me, given how rural certain areas of Pennsylvania are and knowing how rural healthcare is a persistent issue in the US in general. However, it would surprise me if some of these tracts are in urban areas. 
+
+---
+
+#### Step 6: Aggregate to County Level
+
+Use spatial joins and aggregation to calculate county-level statistics about vulnerable populations and hospital access.
+
+**Your Task:**
+```{r}
+# Spatial join tracts to counties
+pa_counties <- pa_counties %>% st_transform(st_crs(vulnerable_tracts))
+
+vulnerable_per_county <- vulnerable_tracts %>%
+  st_join(pa_counties) %>%
+  st_drop_geometry()
+
+# Aggregate statistics by county
+vulnerable_per_county_stats <- vulnerable_per_county %>%
+  group_by(COUNTY_NAM) %>%
+  summarise(
+    num_vulnerable_tracts = n(),
+    num_underserved_tracts = sum(underserved == "Underserved"),
+    percent_underserved = sum(underserved == "Underserved")/n(),
+    avg_distance_to_nearst_hospital = mean(distance_to_nearst_hospital),
+    total_pop = sum(total_popE),
+    total_underserved_pop = sum(ifelse(underserved == "Underserved", total_popE, 0))
+  )
+
+```
+
+**Required county-level statistics:**
+
+- Number of vulnerable tracts
+- Number of underserved tracts  
+- Percentage of vulnerable tracts that are underserved
+- Average distance to nearest hospital for vulnerable tracts
+- Total vulnerable population
+
+**Questions to answer:**
+
+- Which 5 counties have the highest percentage of underserved vulnerable tracts?
+    - Cameron
+    - Juniata
+    - Potter
+    - Snyder
+    - Sullivan
+- Which counties have the most vulnerable people living far from hospitals?
+    - Clearfield
+    - Chester
+    - Juniata
+    - Snyder
+    - Pike
+- Are there any patterns in where underserved counties are located?
+    - There are a lot of quite rural underserved counties, like Sullivan, Juniata, and Clearfield, but there are also suburban counties of major PA cities like Chester County outside of Philadelphia and Cumberland County outside Harrisburg. 
+
+---
+
+#### Step 7: Create Summary Table 
+
+Create a professional table showing the top 10 priority counties for healthcare investment.
+
+**Your Task:**
+```{r}
+# Create and format priority counties table
+vulnerable_per_county_stats %>% 
+  arrange(desc(total_underserved_pop)) %>%
+  slice_head(n = 10) %>%
+  select(
+    c("COUNTY_NAM", "total_underserved_pop", "percent_underserved", "avg_distance_to_nearst_hospital")
+  ) %>%
+  mutate(
+    avg_distance_to_nearst_hospital = as.numeric(avg_distance_to_nearst_hospital),
+    percent_underserved = paste0(round(percent_underserved*100, 2), "%")
+  )%>%
+  kable(
+    col.names = c("County", "Total Underserved Population", "Percent of Vulnerable Tracts that are Underserved", "Average Distance of to Nearest Hospital"),
+    digit = 1,
+    format.args = list(big.mark = ","),
+    align = "l",
+    caption = "10 Counties in PA with the Highest Absolute Population more than 15 miles from Nearest Hospital"
+  )
+
+
+```
+
+**Requirements:**
+
+- Use `knitr::kable()` or similar for formatting
+- Include descriptive column names
+- Format numbers appropriately (commas for population, percentages, etc.)
+- Add an informative caption
+- Sort by priority (you decide the metric)
+
+---
+
+## Part 2: Comprehensive Visualization 
+
+Using the skills from Week 3 (Data Visualization), create publication-quality maps and charts.
+
+### Map 1: County-Level Choropleth 
+
+Create a choropleth map showing healthcare access challenges at the county level.
+
+**Your Task:**
+```{r}
+# Create county-level access map
+vulnerable_per_county_stats <- vulnerable_per_county_stats %>%
+  left_join(pa_counties, by="COUNTY_NAM")
+
+vulnerable_per_county_stats <- vulnerable_per_county_stats %>%
+  st_as_sf() %>% 
+  st_transform(st_crs(census_tracts)) %>%
+  mutate(percent_underserved = percent_underserved*100
+  )
+
+hospitals <- hospitals %>%
+  mutate(type = "Hospital")
+
+ggplot(vulnerable_per_county_stats) +
+  geom_sf(aes(fill = percent_underserved)) +
+  scale_fill_gradient(
+    low = "#C3CDFE",   
+    high = "#485EFE",   
+    name = "% Underserved Tracts"
+  ) +
+  new_scale_fill()+
+  geom_sf(
+    data = hospitals, 
+    aes(fill=type),      
+    size = 3, 
+    shape = 21, 
+    color = "#FF8600",     
+    stroke = 0.8
+  ) +
+  scale_fill_manual(
+    values = c("Hospital" = "#FF8600"),
+    name = NULL
+  )+
+  labs(
+    title = "Underserved Tracts per Counties in Pennsylvania",
+    subtitle = str_wrap("Where an underserved tract is one where the center is at least 15 miles from the nearest hospital",50),
+    caption ="Data Sources: US Census Data, OpenDataPhilly"
+  ) +
+  annotation_north_arrow(             
+    location = "tr",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+
+```
+
+**Requirements:**
+
+- Fill counties by percentage of vulnerable tracts that are underserved
+- Include hospital locations as points
+- Use an appropriate color scheme
+- Include clear title, subtitle, and caption
+- Use `theme_void()` or similar clean theme
+- Add a legend with formatted labels
+
+---
+
+### Map 2: Detailed Vulnerability Map 
+
+Create a map highlighting underserved vulnerable tracts.
+
+**Your Task:**
+```{r}
+# Create detailed tract-level map
+vulnerable_tracts <- vulnerable_tracts %>%
+  st_as_sf() %>% 
+  st_transform(st_crs(census_tracts))
+
+underserved_tracts <- vulnerable_tracts[vulnerable_tracts$underserved=="Underserved",]
+
+pa_counties$legend <- "County Boundary"
+
+ggplot(census_tracts) +
+  geom_sf(
+    color="darkgrey",
+    alpha=.5,
+    size=.5
+  )+
+  geom_sf(
+    data=underserved_tracts,
+    aes(fill = underserved)
+  )+
+  geom_sf(
+    data=pa_counties,
+    aes(color=legend),     
+    linewidth = .8,
+    fill=NA
+  )+
+  geom_sf(
+    data=hospitals,
+    aes(fill = type),      
+    size = 1, 
+    shape = 21, 
+    color = "#FF8600",     
+    stroke = 0.8
+  )+
+  scale_fill_manual(
+    values = c("Underserved" = "#485EFE",
+               "Hospital" = "#FF8600"),
+    name = NULL  
+  ) +
+  scale_color_manual(
+    values = c("County Boundary" = "black"),
+    name = NULL
+  ) +
+  annotation_north_arrow(             
+    location = "tr",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void()+
+  labs(
+    title = "Underserved Tracts in Pennsylvania",
+    subtitle = str_wrap("Where an underserved tract's center is at least 15 miles from the nearest hospital",50),
+    caption ="Data Sources: US Census Data, Pennsylvania Spatial Data Access"
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+
+```
+
+**Requirements:**
+
+- Show underserved vulnerable tracts in a contrasting color
+- Include county boundaries for context
+- Show hospital locations
+- Use appropriate visual hierarchy (what should stand out?)
+- Include informative title and subtitle
+
+---
+
+### Chart: Distribution Analysis
+
+Create a visualization showing the distribution of distances to hospitals for vulnerable populations.
+
+**Your Task:**
+
+```{r}
+#| output: False
+
+# Create distribution visualization
+
+#Load regions
+dep_regions<- st_read("data/DEPRegions2024_03.shp")
+```
+
+```{r}
+dep_regions <- dep_regions %>% st_transform(st_crs(vulnerable_tracts))
+
+vulnerable_tracts <- vulnerable_tracts %>% 
+  mutate(
+      urban_rural = case_when(
+      total_popE >= 5000 ~ "Urban",
+      TRUE ~ "Rural"
+      )
+  )
+
+vulnerable_tracts_with_regions <- vulnerable_tracts %>%
+  st_join(dep_regions) %>%
+  st_drop_geometry()
+
+vulnerable_tracts_with_regions <- vulnerable_tracts_with_regions %>%
+  mutate(
+    Region = case_when(
+      SNAME == "NCRO"~"North Central",
+      SNAME =="NERO"~"North East",
+      SNAME=="NWRO"~"North West",
+      SNAME=="SCRO"~"South Central",
+      SNAME=="SERO"~"South East",
+      SNAME=="SWRO"~"South West"
+    )
+  )
+  
+  
+ggplot(vulnerable_tracts_with_regions)+
+  geom_boxplot(
+    aes(x=Region, y=distance_to_nearst_hospital)
+  )+
+  labs(
+    title="Distance of Vulnerable Tracts to Nearest Hospital by Region",
+    caption=str_wrap("Where a vulnerable tract is in the top 25% of concentration of elderly population or 215% of the Federal Poverty Line for 2-person household. Data sources: US Census, Pennsylvania Spatial Data Access, Department of Environmental Protection Regions",100),
+    y=str_wrap("Distance from Center of Tract to Nearest Hospital",50),
+    x="Region of Tract"
+  )+
+  theme(
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+
+```
+
+Northern Pennsylvania vulnerable populations generally are location farther from hospitals than Southern Pennsylvania, with North Central PA having the highest median and upper quartiles of distance to the nearest hospital of all 6 regions. However another trend we can see is that the highest number of outliers fall within the South East and South West regions, home to the two biggest cities in PA, Philadelphia and Pittsburgh, respectively. That shows that these regions have more tracts that are facing very different needs that the middle 50% of the region.
+
+
+**Suggested chart types:**
+
+- Histogram or density plot of distances
+- Box plot comparing distances across regions
+- Bar chart of underserved tracts by county
+- Scatter plot of distance vs. vulnerable population size
+
+**Requirements:**
+
+- Clear axes labels with units
+- Appropriate title
+- Professional formatting
+- Brief interpretation (1-2 sentences as a caption or in text)
+
+---
+
+## Part 3: Bring Your Own Data Analysis 
+
+Choose your own additional spatial dataset and conduct a supplementary analysis.
+
+### Challenge Options
+
+Choose ONE of the following challenge exercises, or propose your own research question using OpenDataPhilly data (https://opendataphilly.org/datasets/). 
+
+
+---
+
+
+### Your Analysis
+
+#### Digital Justice
+
+- **Data:** Census Broadband access, device access, and income, Philadelphia free wifi spots from OpenDataPhilly
+- **Question:** "Do digitally disadvantaged neighborhoods have equitable access to city internet?"
+- **Operations:** Buffer free wifi spots with a computer (10-minute walk = 0.5 mile), calculate connectivity by tract, determine digitally vulnerable tracts from census data and underserved tracts by distance from buffers. 
+- **Policy relevance:** Digital equity, broadband infrastructure, internet-connected device access
+
+1. **Find and load additional data**
+
+   - Document your data source
+   - Check and standardize the CRS
+   - Provide basic summary statistics
+
+```{r}
+#| output: False
+
+# Load your additional dataset
+v21 <- load_variables(2023, "acs5", cache = TRUE)
+
+# Search for broadband and computer-related variables
+bb_vars <- v21 %>% filter(str_detect(label, "broadband"))
+comp_vars <-v21 %>% filter(str_detect(label, "computer"))
+
+#B28003_002 = total with computer
+#B28002_004 = total with broadband internet subscription
+
+philly_digital_access <-  get_acs(
+  geography = "tract",
+  variables = c(
+    total_pop = "B01003_001",
+    has_computer = "B28003_002", 
+    has_broadband = "B28002_004"
+  ),
+  state = "PA",
+  county = "Philadelphia",
+  year = 2023,
+  output = "wide"
+)
+
+free_wifi_spots <- st_read("data/free_city_wifi_locations.shp")%>%st_transform(2272)
+
+philly_digital_access <- left_join(
+  philly_digital_access,
+  census_tracts,
+  by="GEOID"
+) %>%
+  st_as_sf() %>%
+  st_transform(2272)
+
+ggplot(philly_digital_access)+
+  geom_sf()+
+  geom_sf(
+    data=free_wifi_spots
+  )+
+  theme_void()+
+  labs(
+    title = "Free Wi-Fi Spots in Philadelphia",
+    caption ="Data Sources: US Census Data, OpenDataPhilly"
+  ) +
+  annotation_north_arrow(             
+    location = "br",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+
+```
+
+**Questions to answer:**
+
+- What dataset did you choose and why?
+  - I choose the ACS variables showing whether a household has broadband access and whether they have a computer, as well as OpenDataPhilly's database of free wi-fi locations, which inlcudes a variable showing how many public use computers are available at the location. 
+- What is the data source and date?
+  - The ACS data is 5-year data from 2018 - 2023, and the wi-fi locations are from 2024, so the home broadband and computer access data may be slightly outdated. Also important to note is 2018 - 2023 range includes the pandemic, a period in which there was unprecedented investment in home internet subsidies that have expired in 2024 [Affordable Connectivity Program](https://technical.ly/civic-news/affordable-connectivity-program-ending-comcast-verizon-congress-act/).
+- How many features does it contain?
+  - There are 254 free-wifi locations, and 408 census tracts in Philadelphia. 
+- What CRS is it in? Did you need to transform it?
+  - Before transformation, both datasets were in web mercator, EPSG 3857, and since Philly falls within southern pennsylvania, I transformed it to Pennsylvania South state plane projection, EPSG 2272. 
+  
+---
+
+2. **Pose a research question**
+
+Do digitally vulnerable tracts have adequate access to free wifi spots with computers?
+
+---
+
+3. **Conduct spatial analysis**
+
+Use at least TWO spatial operations to answer your research question.
+
+**Required operations (choose 2+):**
+
+- Buffers
+- Spatial joins
+- Spatial filtering with predicates
+- Distance calculations
+- Intersections or unions
+- Point-in-polygon aggregation
+
+**Your Task:**
+```{r}
+# Your spatial analysis
+
+#Filter Philly census tracts by the most digitally vulnerable: in the top quartile of percent of tract that has no home broadband or top quartile of percent of tract with no computer. 
+philly_digital_access <- philly_digital_access %>%
+  mutate(
+    percent_no_bb = (1-has_broadbandE/total_popE.x)*100,
+    percent_no_comp = (1-has_computerE/total_popE.x)*100
+  )
+
+summary(philly_digital_access$percent_no_bb)
+summary(philly_digital_access$percent_no_comp)
+```
+
+```{r}
+#based on summary stats, the most digitally vulnerable are tract with 68.65% or more of households that do not have home broadband or 65.62% or more of households that do not have a computer. 
+
+digit_vulnerable_philly <- philly_digital_access %>%
+  filter(percent_no_bb>=68.65 | percent_no_comp>=65.62 )%>%
+  mutate(Vulnerable="Digtally Vulnerable Tract")
+
+#visually examine digitally vulnerable tracts and free wifi spots with computers
+ggplot(philly_digital_access)+
+  geom_sf()+
+  geom_sf(
+    data=digit_vulnerable_philly,
+    aes(fill=Vulnerable)
+  )+
+  scale_fill_manual(
+    values=c("Digtally Vulnerable Tract" = "purple")
+  )+
+  geom_sf(data=free_wifi_spots[free_wifi_spots$computers_=="Y",])+
+  theme_void()+
+  labs(
+    title = str_wrap("Digitally Vulnerable Tracts and Free Wifi Spots with a Computer in Philadelphia",70),
+    subtitle = str_wrap("Where a vulnerable tract is one where 68.65% or more of households do not have home broadband or 65.62% or more of households do not have a computer",60),
+    caption ="Data Sources: US Census Data, OpenDataPhilly"
+  ) +
+  annotation_north_arrow(             
+    location = "br",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+```
+
+```{r}
+# Find nearest free wifi spots with a computer to tract centroids 
+digit_vulnerable_centroids <- st_centroid(digit_vulnerable_philly)
+nearest_wifi_spot_comp <- st_nearest_feature(digit_vulnerable_centroids, free_wifi_spots[free_wifi_spots$computers_=="Y",])
+
+digit_vulnerable_philly <- digit_vulnerable_philly %>%
+  mutate(nearest_wifi_spot_geom = free_wifi_spots$geometry[nearest_wifi_spot_comp])
+
+digit_vulnerable_philly <- digit_vulnerable_philly %>%
+  mutate(distance_wifi_spot_comp = set_units(st_distance(digit_vulnerable_centroids, digit_vulnerable_philly$nearest_wifi_spot_geom, by_element = TRUE), "mi"))
+
+summary(digit_vulnerable_philly$distance_wifi_spot_comp) 
+```
+
+```{r}
+#Find walking distance buffers around free wifi spots with computers 
+free_wifi_buffers <- free_wifi_spots %>%
+  filter(computers_=="Y" & to_display=="ACTIVE")%>%
+  st_buffer(dist = 2640)  # 2640 ft = .5 mi
+
+
+#dissolve overlapping buffers 
+free_wifi_buffers_dissolve <- free_wifi_buffers%>%
+  st_union() %>%
+  st_cast("POLYGON")%>%
+  st_as_sf()%>%
+    mutate(
+    legend= ".5 mi from Free Wifi Spot w Computer"
+  )
+
+  
+#examine buffers and tracts overlap
+ggplot(philly_digital_access)+
+  geom_sf(
+    color="darkgray",
+    linewidth=.5,
+    alpha=.5
+  )+
+  geom_sf(
+    data=digit_vulnerable_philly,
+    aes(fill=percent_no_bb+percent_no_comp)
+  )+
+  scale_fill_gradient(
+    low="#FFCF33",
+    high="#F53D00",
+    name=str_wrap("Digital Vulnerability (higher number is more vulnerable)",30)
+  )+
+  new_scale_fill()+
+  geom_sf( 
+    data=free_wifi_buffers_dissolve,
+    aes(fill=legend),
+    color="black",
+    linewidth=.8,
+    alpha=0.4
+  )+
+  scale_color_manual(
+    values = c(".5 mi from Free Wifi Spot w Computer" =  "#F5A6E6") ,
+    name=NULL
+  )+
+  theme_void()+
+  labs(
+    title = str_wrap("Degree of Digital Vulnerability and Walking Distance to Public WiFi & Computer",50),
+    caption ="Data Sources: US Census Data, OpenDataPhilly"
+  ) +
+  annotation_north_arrow(             
+    location = "br",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL))+
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+
+```
+
+```{r}
+#| output: False
+
+#Define underserved tract as a tract that is digitally vulnerable and outside walking distance to a free wifi spot with a computer. 
+
+overlap <- st_intersects(digit_vulnerable_philly, free_wifi_buffers)
+
+no_overlap <- lengths(overlap) == 0
+
+digit_underserved <- digit_vulnerable_philly[no_overlap, ]
+
+summary(digit_underserved)
+```
+
+```{r}
+
+#what are characteristics of top 10 digitally underserved tracts by absolute number of those with no broadband + those with no computer? 
+
+#note, the sum of estiamated households without computer and without broadband is not an accurate estimate of reality because those without one are likely overlapping with the other. This metric is just being used to create a metric showing reflecting broadband and computer need in one. 
+digit_underserved<-digit_underserved%>%
+  mutate(
+    digit_need_heuristic = (total_popE.x - has_computerE)+(total_popE.x - has_broadbandE)
+  )
+
+top_10_digit_underserved <- digit_underserved%>%
+  arrange(desc(digit_need_heuristic))%>%
+  slice_head(n = 10)
+ 
+top_10_digit_underserved %>%
+  st_drop_geometry()%>%
+  select(c(
+    "percent_no_bb",
+    "percent_no_comp",
+    "median_incomeE",
+    "distance_wifi_spot_comp"
+  )) %>%
+  kable(
+    col.names = c("Percent w/o Broadband",
+                  "Percent w/o a Computer", 
+                  "Median Income", 
+                  "Distance to Free Wi-Fi spot w/ Computer"),
+    digits = 1,
+    format.args = list(big.mark = ","),
+    align = "l",
+    caption = "10 Census Tracts in Philadelphia that have Highest Digitally Vulnerable Population"
+  )
+
+```
+```{r}
+#Map the underserved tracts and wifi spots buffers 
+digit_underserved<-digit_underserved%>%
+  mutate(
+    legend="Digitally Underserved Tract"
+  )
+
+ggplot(philly_digital_access)+
+  geom_sf(
+    color="darkgray",
+    linewidth=.5,
+    alpha=.5
+  )+
+  geom_sf(
+    data=digit_underserved,
+    aes(fill="Digitally Underserved Tract")
+  )+
+  scale_fill_manual(
+    values = c("Digitally Underserved Tract" = "#3F88C5"),
+    name=NULL
+  )+
+  new_scale_fill()+
+  geom_sf( 
+    data=free_wifi_buffers_dissolve,
+    aes(fill=".5 mi from Free Wifi Spot w Computer"),
+    color="black",
+    linewidth=.8,
+    alpha=0.4
+  )+
+  scale_color_manual(
+    values = c(".5 mi from Free Wifi Spot w Computer" =  "#F5A6E6") 
+  )+
+  guides(fill = guide_legend(title = NULL))+
+  theme_void()+
+    labs(
+    title = str_wrap("Digitally Underserved Tracts in Philadelphia ",40),
+    caption ="Data Sources: US Census Data, OpenDataPhilly"
+  ) +
+  annotation_north_arrow(             
+    location = "br",                  
+    which_north = "true",
+    style = north_arrow_minimal
+  ) +
+  theme_void() +
+  guides(fill = guide_legend(title = NULL))+
+  theme(
+    legend.position = "right",
+    legend.direction = "vertical",
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
+  )
+```
+**Analysis requirements:**
+
+- Clear code comments explaining each step
+- Appropriate CRS transformations
+- Summary statistics or counts
+- At least one map showing your findings
+- Brief interpretation of results (3-5 sentences)
+
+**Your interpretation:**
+
+While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The internet has become indispensable to most educational, workforce, social, and civic needs, and thus policy should primarily aim to enable every person to have home broadband and a computer. However, while that may be a long-term goal, free Wi-Fi and computer centers help bridge the gap. Thus they should prioritize locations as close as possible to the most digitally vulnerable areas of Philadelphia, seeing as a longer commute to these centers will compound the barriers already faced by not having broadband or a computer at home. 
+
+
+## Finally - A few comments about your incorporation of feedback!
+
+Taking feedback into account, I have hidden sensitive code blocks and hidden lengthy console output that is not essential to interpreting my work!
+
+---
+
+## Submission Requirements
+
+**What to submit:**
+
+1. **Rendered HTML document posted to your course portfolio** with all code, outputs, maps, and text
+   - Use `embed-resources: true` in YAML so it's a single file
+   - All code should run without errors
+   - All maps and charts should display correctly
+
+**File naming:** `LastName_FirstName_Assignment2.html` and `LastName_FirstName_Assignment2.qmd`
+
+---
+
