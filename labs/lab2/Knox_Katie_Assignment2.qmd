@@ -879,13 +879,15 @@ top_10_digit_underserved <- digit_underserved%>%
 top_10_digit_underserved %>%
   st_drop_geometry()%>%
   select(c(
+    "NAMELSAD",
     "percent_no_bb",
     "percent_no_comp",
     "median_incomeE",
     "distance_wifi_spot_comp"
   )) %>%
   kable(
-    col.names = c("Percent w/o Broadband",
+    col.names = c("Census Tract",
+                  "Percent w/o Broadband",
                   "Percent w/o a Computer", 
                   "Median Income", 
                   "Distance to Free Wi-Fi spot w/ Computer"),
@@ -959,7 +961,9 @@ ggplot(philly_digital_access)+
 
 **Your interpretation:**
 
-While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The internet has become indispensable to most educational, workforce, social, and civic needs, and thus policy should primarily aim to enable every person to have home broadband and a computer. However, while that may be a long-term goal, free Wi-Fi and computer centers help bridge the gap. Thus they should prioritize locations as close as possible to the most digitally vulnerable areas of Philadelphia, seeing as a longer commute to these centers will compound the barriers already faced by not having broadband or a computer at home. 
+While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The estimated number of households in these 30 tracts without broadband is 103,418 and without a computer is 100,478. The average distance from these underserved tracts to the nearest free Wi-Fi and computer center is 7 miles.
+
+The internet has become indispensable to most educational, workforce, social, and civic needs, and thus policy should primarily aim to enable every person to have home broadband and a computer. However, while that may be a long-term goal, free Wi-Fi and computer centers help bridge the gap. Thus they should prioritize locations as close as possible to the most digitally vulnerable areas of Philadelphia, seeing as a longer commute to these centers will compound the barriers already faced by not having broadband or a computer at home. 
 
 
 ## Finally - A few comments about your incorporation of feedback!

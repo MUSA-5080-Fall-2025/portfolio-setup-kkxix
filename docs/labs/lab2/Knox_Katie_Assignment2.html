@@ -4997,32 +4997,36 @@ vertical-align: -.125em;
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>top_10_digit_underserved <span class="sc">%&gt;%</span></span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()<span class="sc">%&gt;%</span></span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;percent_no_bb&quot;</span>,</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;percent_no_comp&quot;</span>,</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;median_incomeE&quot;</span>,</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;distance_wifi_spot_comp&quot;</span></span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Percent w/o Broadband&quot;</span>,</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Percent w/o a Computer&quot;</span>, </span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median Income&quot;</span>, </span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Distance to Free Wi-Fi spot w/ Computer&quot;</span>),</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">1</span>,</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>),</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">&quot;l&quot;</span>,</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;10 Census Tracts in Philadelphia that have Highest Digitally Vulnerable Population&quot;</span></span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;NAMELSAD&quot;</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;percent_no_bb&quot;</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;percent_no_comp&quot;</span>,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;median_incomeE&quot;</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;distance_wifi_spot_comp&quot;</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Census Tract&quot;</span>,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Percent w/o Broadband&quot;</span>,</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Percent w/o a Computer&quot;</span>, </span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median Income&quot;</span>, </span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Distance to Free Wi-Fi spot w/ Computer&quot;</span>),</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">1</span>,</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">format.args =</span> <span class="fu">list</span>(<span class="at">big.mark =</span> <span class="st">&quot;,&quot;</span>),</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;10 Census Tracts in Philadelphia that have Highest Digitally Vulnerable Population&quot;</span></span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>10 Census Tracts in Philadelphia that have Highest Digitally Vulnerable Population</caption>
 <colgroup>
-<col style="width: 22%">
-<col style="width: 23%">
-<col style="width: 14%">
-<col style="width: 40%">
+<col style="width: 16%">
+<col style="width: 18%">
+<col style="width: 19%">
+<col style="width: 11%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="header">
+<th style="text-align: left;">Census Tract</th>
 <th style="text-align: left;">Percent w/o Broadband</th>
 <th style="text-align: left;">Percent w/o a Computer</th>
 <th style="text-align: left;">Median Income</th>
@@ -5031,60 +5035,70 @@ vertical-align: -.125em;
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: left;">Census Tract 90</td>
 <td style="text-align: left;">82.4</td>
 <td style="text-align: left;">79.6</td>
 <td style="text-align: left;">38,976</td>
 <td style="text-align: left;">2.464926 [mi]</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Census Tract 192</td>
 <td style="text-align: left;">73.3</td>
 <td style="text-align: left;">70.4</td>
 <td style="text-align: left;">13,721</td>
 <td style="text-align: left;">7.369100 [mi]</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Census Tract 314.01</td>
 <td style="text-align: left;">75.5</td>
 <td style="text-align: left;">71.6</td>
 <td style="text-align: left;">56,818</td>
 <td style="text-align: left;">10.021851 [mi]</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Census Tract 310</td>
 <td style="text-align: left;">73.6</td>
 <td style="text-align: left;">71.7</td>
 <td style="text-align: left;">68,652</td>
 <td style="text-align: left;">9.960189 [mi]</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Census Tract 300</td>
 <td style="text-align: left;">70.9</td>
 <td style="text-align: left;">67.3</td>
 <td style="text-align: left;">33,419</td>
 <td style="text-align: left;">5.459912 [mi]</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Census Tract 305.02</td>
 <td style="text-align: left;">76.1</td>
 <td style="text-align: left;">74.2</td>
 <td style="text-align: left;">50,245</td>
 <td style="text-align: left;">5.314348 [mi]</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Census Tract 363.03</td>
 <td style="text-align: left;">69.9</td>
 <td style="text-align: left;">67.5</td>
 <td style="text-align: left;">100,857</td>
 <td style="text-align: left;">13.774589 [mi]</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Census Tract 274.02</td>
 <td style="text-align: left;">67.8</td>
 <td style="text-align: left;">67.5</td>
 <td style="text-align: left;">71,551</td>
 <td style="text-align: left;">3.367629 [mi]</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Census Tract 100</td>
 <td style="text-align: left;">67.6</td>
 <td style="text-align: left;">67.1</td>
 <td style="text-align: left;">54,871</td>
 <td style="text-align: left;">8.256588 [mi]</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;">Census Tract 362.01</td>
 <td style="text-align: left;">68.1</td>
 <td style="text-align: left;">66.5</td>
 <td style="text-align: left;">93,300</td>
@@ -5163,7 +5177,8 @@ vertical-align: -.125em;
 <li>Brief interpretation of results (3-5 sentences)</li>
 </ul>
 <p><strong>Your interpretation:</strong></p>
-<p>While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The internet has become indispensable to most educational, workforce, social, and civic needs, and thus policy should primarily aim to enable every person to have home broadband and a computer. However, while that may be a long-term goal, free Wi-Fi and computer centers help bridge the gap. Thus they should prioritize locations as close as possible to the most digitally vulnerable areas of Philadelphia, seeing as a longer commute to these centers will compound the barriers already faced by not having broadband or a computer at home.</p>
+<p>While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The estimated number of households in these 30 tracts without broadband is 103,418 and without a computer is 100,478. The average distance from these underserved tracts to the nearest free Wi-Fi and computer center is 7 miles.</p>
+<p>The internet has become indispensable to most educational, workforce, social, and civic needs, and thus policy should primarily aim to enable every person to have home broadband and a computer. However, while that may be a long-term goal, free Wi-Fi and computer centers help bridge the gap. Thus they should prioritize locations as close as possible to the most digitally vulnerable areas of Philadelphia, seeing as a longer commute to these centers will compound the barriers already faced by not having broadband or a computer at home.</p>
 </section>
 </section>
 </section>
