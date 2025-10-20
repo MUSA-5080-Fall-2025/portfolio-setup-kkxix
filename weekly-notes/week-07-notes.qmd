@@ -1,0 +1,33 @@
+---
+title: Week 7 Notes
+date: 2025-10-20
+editor:
+  markdown:
+    wrap: 72
+---
+## Notes
+
+#### Model Errors 
+- random errors are good, clustered errors are bad 
+- one tool to investigate - spatial autocorrelation of errors 
+
+**Tobler's First Law**
+- Everything is related to everything, but near things are more related than distanct things
+- Is there a spatial aspect/clustering of higher vs lower errors? --> Start by mapping residuals
+
+**Moran's I**
+Measure of spatial autocorrelation -- range -1 to +1 where -1 is perfect negative correlation (dispersion) and +1 is perfect positive correlation (clustering)
+
+Defining neighbors
+- **Contiguity** -- polygons that share a border (queen in chess)
+- **Distance** -- all within X meters, fixed threshol 
+- **k-Nearest** - closest k points, adaptive distance -- use this for point data like houses -- r function is `knn2nk()` then use the results of that in `nb2listw()` which creates a binary matrix of whether two points are neighbors 
+
+Computing Moran's I 
+- pass the weights into `moran.mc()` then `moran_test$statistic` is the Moran's I value
+- `moran_test$p.value` shows significance - if p.value < 0.05, very significant clustering! bad!
+
+What Moran's I tells you --> 
+1. Add more spatial features
+2. Try spatial fixed effects
+3. Consider spatial regression models 

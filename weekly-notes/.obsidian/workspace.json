@@ -25,12 +25,14 @@
             "id": "80c752e3f76439eb",
             "type": "leaf",
             "state": {
-              "type": "release-notes",
+              "type": "markdown",
               "state": {
-                "currentVersion": "1.9.14"
+                "file": "week-07-notes.qmd",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-book-up",
-              "title": "Release Notes 1.9.14"
+              "icon": "lucide-file",
+              "title": "week-07-notes"
             }
           }
         ],
@@ -182,6 +184,9 @@
   },
   "active": "80c752e3f76439eb",
   "lastOpenFiles": [
+    "week-06-notes.qmd",
+    "week-07-notes.qmd",
+    "week-05-notes.qmd",
     "week-05-notes.html",
     "week-05-notes_files/mediabag",
     "week-05-notes_files",
@@ -189,14 +194,11 @@
     "week-04-notes_files/mediabag",
     "week-04-notes_files",
     "week-04-notes.qmd",
-    "week-05-notes.qmd",
     "Pasted image 20251006120758.png",
     "Pasted.md",
     "week-04-notes.rmarkdown",
     "Pasted image 20250929124318.png",
     "Pasted image 20250929124013.png",
-    "week-03-notes.html",
-    "week-03-notes_files/mediabag",
     "Pasted image 20250929123519.png",
     "Pasted image 20250929123417.png",
     "Pasted image 20250929123131.png",

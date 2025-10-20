@@ -1,0 +1,43 @@
+---
+title: Week 6 Notes
+date: 2025-10-13
+editor:
+  markdown:
+    wrap: 72
+---
+## Notes
+
+transforming csv or other such data into SF 
+`st_as_af()`
+- option: if your data has coordinates, then `coords = c("Name of Long column", "name of lat column")` -- and set the CRS appropriately (e.g. `crs = 4326`) based on the coordinate system, but then transform into something more appropriate like state plane. 
+
+Change categorical variable (such as neighborhood name) as a numerical factor that can be used in model 
+- `mutate(name = as.factor(name))`
+- first category alphabetically is chosen as reference variable, and the coefficients for the rest are in comparison to that
+
+#### Interaction Effects 
+- when the effect of one variable on the model depends on another variable (i.e. square footage matters more to price in a fancy neighborhood than nonfancy neighborhood)
+- instead of `ind_var_1 + ind_var_2` , for two variables you think interact, use `ind_var_1 * ind_var_2`
+
+
+#### Polynomials
+- caution interpreting coefficients with quadratic terms 
+
+#### Using Spatial Features 
+
+**3 tricks**:
+1. Buffer Aggregation 
+	-  draw a buffer around the house, and calculate features that fall within the buffer (e.g. number of crimes in .5 mi radius)
+2. k-Nearest Neighbors (kNN)
+	-  What is the average distance to the k-nearest features (e.g. what is average distance from house to 3 nearest crimes, low = close, high = far)
+3. Distance to Specific Points
+	- Straight-line distance to important features (e.g. distance from house to city hall)
+
+#### Fixed Effect 
+- some variable which summarizes other potential factors (e.g. neighborhood might stand in for a number of more specific variables that are harder to find data for perhaps)
+
+#### k-folds
+- want to make sure for instance that a category exists in as many instances as you have folds (e.g. if there are only 3 examples in Rittenhouse, 10-fold might have issues)
+- solution: 
+	- drop sparse categories 
+
