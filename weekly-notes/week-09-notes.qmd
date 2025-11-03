@@ -1,0 +1,74 @@
+---
+title: Week 9 Notes
+date: 2025-11-03
+editor:
+  markdown:
+    wrap: 72
+---
+## Notes
+
+#### Predictive Policing 
+- PREDPOL, Palantir, Hunch 
+- Dirty Data 
+- More likely to predict what police are already doing rather than preventing novel crimes
+- A branch of "technological solutionism" 
+
+#### Contribute to 30-day map challenge 
+
+**Revisiting Spatial Lag**
+- e.g. adding a term in housing prediction model that takes into account average neighboring house prices 
+	- Problem when using for prediction -- you *don't have* future neighbor prices... so problematic to include in model 
+		- if you use current neighbor sales... risk over emphasizing past prices 
+		- if you use predicted future neighbor sale values... problem of circularity 
+
+#### Predictive Policing Workflow
+1. Setup & Data
+	- (dirty) burglary data from police
+	- (dirty) 311 calls about abandoned cars
+	- **Create fishnet** (500m x 500m grid)
+		- a common unit of analysis
+	- aggregate burglaries to cells
+2. Baseline Comparison 
+	- **Kernel Density Estimation (KDE)**
+		- Does our model perform better than the KDE? 
+	- Simple spatial smoothing 
+	- What we need to beat 
+3. Feature engineering
+	- - k-Nearest Neighbors
+	- LISA (Local Moran's I)
+4. Count Regression Models 
+5. Spatial Cross-Validation
+	- Specific CV to spatial applications 
+6. Model Comparison 
+
+**Core Logic: "Broken Windows Theory" - i.e. visual signs of 'disorder' lead to criminal activity**
+
+**Spatial Weights Matrix**
+- Global Moran's I gives us a value from \[-1, 1\] 
+	- Positive is similar values cluster
+	- Negative is dissimilar values cluster
+	- 0 is no clustering 
+- Local Moran's I 
+	- Test for statistical significance - so every estimate gets a p-value 
+- Moran Scatterplot 
+	- High-high = hotspot 
+	- High-low = outliers
+	- Low-low = coldspot
+	- Low-high = outliers
+
+**Poisson Distribution**
+- Appropriate for count data 
+- Poisson assumption: Variance = mean 
+
+**Poisson Regression**
+- Log terms 
+- In R, use `glm()` instead of `lm()`
+- Test for overdispersion
+- Use `glm.nb()` if there is overdispersion 
+
+**Spatial Cross-Validation**
+- Standard CV might fail for spatial data because nearby observations are correlated; **Spatial leakage**, or model learns from neighbors of test set 
+- Instead group together and remove neighbors together in a fold 
+
+**Kernel Density Estimation**
+- create a kernel out of different densities of observations

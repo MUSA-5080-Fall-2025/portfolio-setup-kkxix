@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "week-07-notes.qmd",
+                "file": "week-09-notes.qmd",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "week-07-notes"
+              "title": "week-09-notes"
             }
           }
         ],
@@ -184,8 +184,9 @@
   },
   "active": "80c752e3f76439eb",
   "lastOpenFiles": [
-    "week-06-notes.qmd",
     "week-07-notes.qmd",
+    "week-09-notes.qmd",
+    "week-06-notes.qmd",
     "week-05-notes.qmd",
     "week-05-notes.html",
     "week-05-notes_files/mediabag",
@@ -196,7 +197,6 @@
     "week-04-notes.qmd",
     "Pasted image 20251006120758.png",
     "Pasted.md",
-    "week-04-notes.rmarkdown",
     "Pasted image 20250929124318.png",
     "Pasted image 20250929124013.png",
     "Pasted image 20250929123519.png",
