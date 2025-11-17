@@ -1,0 +1,524 @@
+---
+title: "Assignment 4: Spatial Predictive Analysis"
+author: "Katie Knox"
+date: "11-16-2025"
+format: 
+  html:
+    code-fold: false
+    toc: true
+    toc-location: left
+    theme: cosmo
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| echo: false
+
+
+# Load required packages
+library(sf)
+library(tidyverse)
+library(ggplot2)
+library(tigris)
+library(tidycensus)
+library(patchwork)
+library(units)
+library(knitr)
+library(ggspatial)
+library(ggnewscale)
+library(kableExtra)
+library(gridExtra)
+library(FNN)
+library(spdep)
+library(patchwork)
+library(MASS)
+library(spatstat)
+library(raster)
+library(scales)
+
+census_api_key("42bf8a20a3df1def380f330cf7edad0dd5842ce6")
+```
+## Part 1: Collect 311 Violation Data
+
+I have chosen to look at "All street lights out" violations, because it is more cozy to commit crimes when the lights are out. 
+
+```{r}
+#| echo: false
+
+all_lights_out <- read.csv("C:/Users/knoxk/OneDrive/Documents/musa-5080/portfolio-setup-kkxix/labs/lab_4/data/311_Service_Requests_-_Street_Lights_-_All_Out_-_Historical_20251116.csv")
+
+all_lights_out <- all_lights_out %>%
+  filter(!is.na(Latitude), !is.na(Longitude)) %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) 
+
+
+tmp <- capture.output(chi_boundary <- places(state = "IL", cb = TRUE) %>%
+  filter(NAME == "Chicago") %>%
+  st_as_sf()  )
+
+```
+
+```{r}
+
+chi_boundary<-chi_boundary%>%st_transform(st_crs(all_lights_out))
+
+chi_boundary<-chi_boundary%>%st_transform(26971)
+all_lights_out<-all_lights_out%>%st_transform(26971)
+
+all_lights_out%>%
+  ggplot()+
+  geom_sf(alpha = 0.1, color = "lightblue")+
+  geom_sf(data = chi_boundary, fill = NA, color = "darkgreen")+
+  theme_void()
+```
+The 311 complaints of all street lights out are seemingly very ubiquitous across Chicago! Every part of the city is very visual dense with instances. The only empty areas are where the airport is located, and where there are bodies of water and parks. 
+
+
+## Part 2: Fishnet Grid
+
+```{r}
+# Step 1: Define cell size (in map units - meters for this projection)
+cell_size <- 500  # 500m x 500m cells
+
+# Step 2: Create grid over study area
+fishnet <- st_make_grid(
+  chi_boundary,
+  cellsize = cell_size,
+  square = TRUE,
+  what = "polygons"
+) %>%
+  st_sf() %>%
+  mutate(uniqueID = row_number())
+
+# Step 3: Clip to study area (remove cells outside boundary)
+fishnet <- fishnet[chi_boundary, ]
+
+# Check results
+nrow(fishnet)  # Number of cells
+st_area(fishnet[1, ])  # Area of one cell (should be 250,000 m²)
+
+fishnet %>%
+  ggplot()+
+  geom_sf()+
+  geom_sf(data = chi_boundary, fill=NA, color="darkgreen")+
+  theme_void()
+```
+```{r}
+# Count lights out per cell
+lights_out_count <- st_join(all_lights_out, fishnet) %>%
+  st_drop_geometry() %>%
+  group_by(uniqueID) %>%
+  summarize(count = n())
+
+# Join back to fishnet
+fishnet <- fishnet %>%
+  left_join(lights_out_count, by = "uniqueID") %>%
+  mutate(count_lights_out = replace_na(count, 0))
+
+# Summary
+summary(fishnet$count_lights_out)
+```
+## Part 3: Spatial Features
+
+Find "Nearest Neighbor"
+
+```{r}
+
+# Calculate distance to nearest complaint of all street lights out
+nn_dist <- get.knnx(
+  data = st_coordinates(all_lights_out),      # "To" locations
+  query = st_coordinates(st_centroid(fishnet)), # "From" locations
+  k = 1                                          # Nearest 1
+)
+
+# Extract distances
+fishnet$lights_out_dists <- nn_dist$nn.dist[, 1]
+summary(fishnet$lights_out_dists)
+```
+
+The median distance from a random 500x500 area in Chicago to a reported incident of all street lights out is 54 meters, and the 3rd quantile is 124 meters. This means the majority of ares in Chicago are very near one such complaint (and likely more than one given the distribution of incident counts per grid cell from the previous step). The mean is higher that the 3rd quantile, showing that max distance is an extreme outlier, likely in one of the park or airport areas where there probably aren't streets in a park let alone street lights. 
+
+Find Local Moran's I
+```{r}
+
+# Step 1: Create spatial object
+fishnet_sp <- as_Spatial(fishnet)
+
+# Step 2: Define neighbors (Queen contiguity)
+neighbors <- poly2nb(fishnet_sp, queen = TRUE)
+
+# Step 3: Create spatial weights (row-standardized)
+weights <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
+
+# Step 4: Calculate Local Moran's I
+local_moran <- localmoran(
+  fishnet$count_lights_out,  # Variable of interest
+  weights,                  # Spatial weights
+  zero.policy = TRUE       # Handle cells with no neighbors
+)
+
+# Step 5: Extract components
+fishnet$local_I <- local_moran[, "Ii"]      # Local I statistic
+fishnet$p_value <- local_moran[, "Pr(z != E(Ii))"]  # P-value
+fishnet$z_score <- local_moran[, "Z.Ii"]    # Z-score
+```
+
+```{r}
+# Standardize the variable for quadrant classification
+fishnet$standardized_value <- scale(fishnet$count_lights_out)
+
+# Calculate spatial lag (weighted mean of neighbors)
+fishnet$spatial_lag <- lag.listw(weights, fishnet$count_lights_out)
+fishnet$standardized_lag <- scale(fishnet$spatial_lag)
+
+# Identify High-High clusters
+fishnet$hotspot <- 0  # Default: not a hotspot
+
+# Criteria: 
+# 1. Value above mean (standardized > 0)
+# 2. Neighbors above mean (spatial lag > 0)
+# 3. Statistically significant (p < 0.05)
+
+fishnet$hotspot[
+  fishnet$standardized_value > 0 & 
+  fishnet$standardized_lag > 0 & 
+  fishnet$p_value < 0.05
+] <- 1
+
+# Count hotspots
+sum(fishnet$hotspot)
+```
+In this step, first each cell’s count of incidents is standardized to measure how much it deviates from the mean, and a spatial lag is calculated to summarize the average counts in neighboring cells based on the intution that areas with high incident counts tend to be near other areas with high counts, so clustering in space can reveal meaningful hotspots of activity. Cells are classified as High-High clusters (hotspots) if they have above-average counts, are surrounded by neighbors with above-average counts, and are statistically significant based on Local Moran’s I (p < 0.05). The fact that the sum of hotspots is 418 indicates that 418 grid cells are part of statistically significant clusters of high incident density. 
+
+```{r}
+fishnet%>%filter(hotspot==1)%>%
+  ggplot()+
+  geom_sf()+
+  theme_void()+
+  geom_sf(data = chi_boundary, fill = NA, color = "darkgreen")
+```
+Looking at a map of these hotspots reveals they are concentrated in areas west and south of the main center city core. 
+
+Next, I find distance of each grid cell to hotspot.
+```{r}
+# Step 1: Identify hotspots 
+hotspot_cells <- filter(fishnet, hotspot == 1)
+
+# Step 2: Calculate distances
+hotspot_dist <- get.knnx(
+  data = st_coordinates(st_centroid(hotspot_cells)),
+  query = st_coordinates(st_centroid(fishnet)),
+  k = 1
+)
+
+fishnet$hotspot_nn <- hotspot_dist$nn.dist[, 1]
+```
+
+```{r}
+# Create comparison maps
+p1 <- ggplot(fishnet) +
+  geom_sf(aes(fill = lights_out_dists), color = NA) +
+  scale_fill_viridis_c(name = "Distance (m)", option = "plasma",  direction = -1) +
+  labs(title = "Distance to Nearest Complaint\nof All Street Lights Out") +
+  theme_void()
+
+
+p2 <- ggplot(fishnet) +
+  geom_sf(aes(fill = hotspot_nn), color = NA) +
+  scale_fill_viridis_c(name = "Distance (m)", option = "plasma",  direction = -1) +
+  labs(title = "Distance to Nearest Hotspot") +
+  theme_void()
+
+p1 + p2 + plot_layout(ncol = 2)
+```
+The distribution of distances shows that individual complaints are much more spatially heterogeneous than the hotspots. While the nearest-complaint distances vary widely across the city, the nearest-hotspot distances are more uniform. This indicates that 311 service requests are concentrated in clusters, and once these clusters are aggregated into hotspots, the spatial variation smooths out. In other words, individual incidents occur in scattered patterns, but the resulting hotspots capture the broader areas of high activity, providing a clearer picture of concentrated problem areas.
+
+## Part 4: Count Regression Models 
+
+Collect crimes data and join crime counts to fishnet
+```{r}
+crimes <- read.csv("C:/Users/knoxk/Downloads/Crimes_-_2018_20251117.csv")
+crimes <- crimes%>%filter(!is.na(Latitude) & !is.na(Longitude))
+crimes_sf <- crimes %>% st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) 
+crimes_sf <- crimes_sf %>% st_transform(26971)
+
+crimes_sf%>%
+  ggplot()+
+  geom_sf(alpha = 0.1, color = "violetred")+
+  geom_sf(data = chi_boundary, fill = NA, color = "darkgreen")+
+  theme_void()
+
+```
+```{r}
+# Count lights out per cell
+crime_count <- st_join(crimes_sf, fishnet) %>%
+  st_drop_geometry() %>%
+  group_by(uniqueID) %>%
+  summarize(crime_count = n())
+
+# Join back to fishnet
+fishnet <- fishnet %>%
+  left_join(crime_count, by = "uniqueID") %>%
+  mutate(crime_count = replace_na(crime_count, 0))
+
+# Summary
+summary(fishnet$crime_count)
+```
+This shows the distribution of crimes per fishnet grid. 
+
+```{r}
+# Fit Poisson model
+model_poisson <- glm(
+  crime_count ~ count_lights_out + lights_out_dists,
+  data = fishnet,
+  family = poisson(link = "log")
+)
+
+# View results
+summary(model_poisson)
+
+# Exponentiate coefficients for interpretation
+exp(coef(model_poisson))
+```
+Using a Poisson Regression where the dependent variable is the number of crimes in a grid cell and the dependent variables are the count of complaints of lights out and distance from grid center to nearest complaint of lights out. The model shows that areas with more “lights out” complaints tend to have slightly higher crime counts. Specifically, each additional street light reported as out in a grid cell is associated with a small increase in the expected number of crimes. Conversely, the farther a location is from the nearest street light outage, the slightly lower the expected crime count. In other words, crimes tend to be more common in areas where street lights are out or clustered, suggesting a very very small link between lighting conditions and crime risk.
+
+```{r}
+# Calculate dispersion parameter
+model_pois <- glm(
+  crime_count ~ count_lights_out + lights_out_dists,
+  data = fishnet,
+  family = poisson
+)
+
+dispersion <- sum(residuals(model_pois, type = "pearson")^2) / model_pois$df.residual
+
+cat("Dispersion parameter:", round(dispersion, 3), "\n")
+
+```
+This dispersion is quite enormous, and shows that the variance is significantly higher than the mean, which violates an assumption of the Poisson Model. 
+
+```{r}
+
+# Fit Negative Binomial model
+model_nb <- glm.nb(
+  crime_count ~ count_lights_out + lights_out_dists,
+  data = fishnet,
+  init.theta = 1,      # starting value for dispersion
+  control = glm.control(epsilon = 1e-8, maxit = 50)
+)
+
+# View results
+summary(model_nb)
+
+# Compare to Poisson
+AIC(model_poisson)
+AIC(model_nb) 
+
+```
+A Negative Binomial model is a type of count regression that estimates the relationship between predictor variables and a count outcome while accounting for overdispersion, making it appropriate when the variance of the counts exceeds the mean, as is the case here. 
+
+Each additional street light reported as out is associated with an approximately 0.78% increase in expected crime counts, while each additional meter further from the nearest lights-out complaint is associated with an approximately 0.08% decrease. These effects are statistically significant, though quite small in magnitude, and the negative binomial model accounts for overdispersion in crime counts, providing more reliable estimates than the Poisson Model. This is supported by the NB model's much lower AIC.
+
+## Part 5: Spatial Cross-Validation
+
+Join districts to fishnet:
+```{r}
+crime_count_dist <- crimes_sf %>%
+  st_join(fishnet) %>%
+  st_drop_geometry() %>%
+  group_by(uniqueID, District) %>% 
+  summarize(crime_count = n(), .groups = "drop")  
+
+crime_count_dist_unique <- crime_count_dist %>%
+  group_by(uniqueID) %>%
+  summarise(
+    crime_count = sum(crime_count, na.rm = TRUE),
+    District = first(District)  # pick first district if multiple
+  )
+
+# Join back to fishnet
+fishnet_2018 <- fishnet %>%
+  left_join(crime_count_dist_unique, by = "uniqueID") %>%
+  mutate(
+    crime_count = replace_na(fishnet$crime_count, 0),
+    District = District  
+  )%>%filter(!is.na(District))
+
+fishnet_2018 <- fishnet_2018 %>% 
+  filter(District != 1 & District != 31)
+```
+
+```{r}
+# Get unique districts
+districts <- unique(fishnet_2018$District)
+
+# Initialize results
+cv_results <- list()
+
+# Loop through districts
+for (dist in districts) {
+  # Split data
+  train_data <- fishnet_2018 %>% filter(District != dist)
+  test_data <- fishnet_2018 %>% filter(District == dist)
+  
+  # Fit model on training data
+  model_cv <- glm.nb(
+  crime_count ~ count_lights_out + lights_out_dists,
+  data = train_data,
+  init.theta = .1,  # starting value for dispersion
+  control = glm.control(maxit = 50, epsilon = 1e-8)
+)
+  
+  # Predict on test data
+  test_data$prediction <- predict(model_cv, test_data, type = "response")
+  
+  # Store results
+  cv_results[[dist]] <- test_data
+}
+
+# Combine all predictions
+all_predictions <- bind_rows(cv_results)
+
+# Calculate metrics by district
+cv_metrics <- all_predictions %>%
+  group_by(District) %>%
+  summarize(
+    MAE = mean(abs(crime_count - prediction)),
+    RMSE = sqrt(mean((crime_count - prediction)^2)),
+    ME = mean(crime_count - prediction)
+  )
+```
+```{r}
+# Map prediction errors
+all_predictions <- all_predictions %>%
+  mutate(
+    error = crime_count - prediction,
+    abs_error = abs(error),
+    pct_error = (prediction - crime_count) / (crime_count + 1) * 100
+  )
+
+# Visualize
+ggplot(all_predictions) +
+  geom_sf(aes(fill = error), color = NA) +
+  scale_fill_gradient2(
+    low = "blue", mid = "white", high = "red",
+    midpoint = 0,
+    name = "Error"
+  ) +
+  labs(title = "Prediction Errors",
+       subtitle = "Red = Over-prediction, Blue = Under-prediction") +
+  theme_void()
+```
+This analysis shows that under-predictions of crimes produced by our model are concentrated in south Chicago, whereas over-predilections are concentrated in more central areas. This indicates that street lights outtages are not able to account for the distribution of crime across the city. 
+
+## Part 6: Model Evaluation
+
+```{r}
+preds <- all_predictions %>%
+  sf::st_drop_geometry() %>%
+  dplyr::select(uniqueID, prediction)
+
+fishnet_2018 <- fishnet_2018 %>%
+  dplyr::left_join(preds, by = "uniqueID")
+
+# Step 1: Convert to point pattern (ppp) object
+lights_out_ppp <- as.ppp(
+  X = st_coordinates(all_lights_out),
+  W = as.owin(st_bbox(chi_boundary))
+)
+
+# Step 2: Calculate KDE
+kde_surface <- density.ppp(
+  lights_out_ppp,
+  sigma = 1000,  # Bandwidth in meters
+  edge = TRUE    # Edge correction
+)
+
+# Step 3: Extract values to fishnet cells
+fishnet_2018$kde_risk <- raster::extract(
+  raster(kde_surface),
+  st_centroid(fishnet_2018)
+)
+
+# Standardize to 0-1 scale for comparison
+fishnet_2018$kde_risk <- (fishnet_2018$kde_risk - min(fishnet_2018$kde_risk, na.rm=T)) / 
+                     (max(fishnet_2018$kde_risk, na.rm=T) - min(fishnet_2018$kde_risk, na.rm=T))
+
+# Create quintiles (5 equal groups)
+fishnet_2018$model_risk_category <- cut(
+  fishnet_2018$prediction,
+  breaks = quantile(fishnet_2018$prediction, probs = seq(0, 1, 0.2)),
+  labels = c("1st (Lowest)", "2nd", "3rd", "4th", "5th (Highest)"),
+  include.lowest = TRUE
+)
+
+fishnet_2018$kde_risk_category <- cut(
+  fishnet_2018$kde_risk,
+  breaks = quantile(fishnet_2018$kde_risk, probs = seq(0, 1, 0.2)),
+  labels = c("1st (Lowest)", "2nd", "3rd", "4th", "5th (Highest)"),
+  include.lowest = TRUE
+)
+
+
+p3 <- ggplot(fishnet_2018) +
+  geom_sf(aes(fill = model_risk_category), color = NA) +
+  labs(title = "Model Risk Quintiles") +
+  theme_void()
+
+p4 <- ggplot(fishnet_2018) +
+  geom_sf(aes(fill = kde_risk_category), color = NA) +
+  labs(title = "KDE Risk Quintiles") +
+  theme_void()
+
+p3 + p4
+
+```
+```{r}
+# Spatial join: 2018 crimes to fishnet with risk categories
+results_2018 <- st_join(fishnet_2018, crimes_sf) %>%
+  group_by(model_risk_category) %>%
+  summarize(crimes_sf = n()) %>%
+  mutate(pct_of_total = 100 * crimes_sf / sum(crimes_sf))%>%
+  dplyr::select("model_risk_category", "pct_of_total")
+
+kde_2018 <- st_join(fishnet_2018, crimes_sf) %>%
+  group_by(kde_risk_category) %>%
+  summarize(crimes_sf = n()) %>%
+  mutate(pct_of_total = 100 * crimes_sf / sum(crimes_sf))%>%
+  dplyr::select("kde_risk_category", "pct_of_total")
+
+kde_2018<- kde_2018%>%st_drop_geometry
+results_2018<- results_2018%>%st_drop_geometry
+
+results_2018_clean <- results_2018 %>%
+  rename(
+    `Model Risk Category` = model_risk_category,
+    `Percent of Crimes` = pct_of_total
+  ) %>%
+  mutate(
+    `Percent of Crimes` = percent(`Percent of Crimes`/100, accuracy = 0.1)
+  )
+
+kde_2018_clean <- kde_2018 %>%
+  rename(
+    `KDE Risk Category` = kde_risk_category,
+    `Percent of Crimes` = pct_of_total
+  ) %>%
+  mutate(
+    `Percent of Crimes` = percent(`Percent of Crimes`/100, accuracy = 0.1)
+  )
+
+kbl(
+  list(results_2018_clean, kde_2018_clean),
+  caption = "Model Risk Areas vs KDE Risk Areas and Percentage of Crimes in Risk Areas"
+) %>% 
+  kable_classic(full_width = FALSE)
+```
+As this table shows, the highest risk area identified by the model account for a slightly smaller percentage of total crimes than the KDE highest risk area. This shows that the model based on street light outtage reports slightly underperforms simply examining peak crime location by historical data in order to account for higher proportions of crime. 
+
+
+
+
