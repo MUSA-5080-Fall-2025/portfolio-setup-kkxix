@@ -636,7 +636,9 @@ philly_digital_access <-  get_acs(
   geography = "tract",
   variables = c(
     total_pop = "B01003_001",
+    total_hh = "B28001_001",
     has_computer = "B28003_002", 
+    smartphone_only = "B28001_006",
     has_broadband = "B28002_004"
   ),
   state = "PA",
@@ -720,19 +722,19 @@ Use at least TWO spatial operations to answer your research question.
 #Filter Philly census tracts by the most digitally vulnerable: in the top quartile of percent of tract that has no home broadband or top quartile of percent of tract with no computer. 
 philly_digital_access <- philly_digital_access %>%
   mutate(
-    percent_no_bb = (1-has_broadbandE/total_popE.x)*100,
-    percent_no_comp = (1-has_computerE/total_popE.x)*100
+    percent_no_bb = (1-has_broadbandE/total_hhE)*100,
+    percent_smart_only = (smartphone_onlyE/total_hhE)*100
   )
 
 summary(philly_digital_access$percent_no_bb)
-summary(philly_digital_access$percent_no_comp)
+summary(philly_digital_access$percent_smart_only)
 ```
 
 ```{r}
-#based on summary stats, the most digitally vulnerable are tract with 68.65% or more of households that do not have home broadband or 65.62% or more of households that do not have a computer. 
+#based on summary stats, the most digitally vulnerable are tract with 17.514% or more of households that do not have home broadband or 15.765% or more of households that do not have a smartphone only.
 
 digit_vulnerable_philly <- philly_digital_access %>%
-  filter(percent_no_bb>=68.65 | percent_no_comp>=65.62 )%>%
+  filter(percent_no_bb>=17.514 | percent_smart_only>=15.765 )%>%
   mutate(Vulnerable="Digtally Vulnerable Tract")
 
 #visually examine digitally vulnerable tracts and free wifi spots with computers
@@ -749,7 +751,7 @@ ggplot(philly_digital_access)+
   theme_void()+
   labs(
     title = str_wrap("Digitally Vulnerable Tracts and Free Wifi Spots with a Computer in Philadelphia",70),
-    subtitle = str_wrap("Where a vulnerable tract is one where 68.65% or more of households do not have home broadband or 65.62% or more of households do not have a computer",60),
+    subtitle = str_wrap("Where a vulnerable tract is one where 17.514% or more of households do not have home broadband or 15.765% or more of households do not have a computer",60),
     caption ="Data Sources: US Census Data, OpenDataPhilly"
   ) +
   annotation_north_arrow(             
@@ -782,6 +784,11 @@ summary(digit_vulnerable_philly$distance_wifi_spot_comp)
 ```
 
 ```{r}
+digit_vulnerable_philly%>%filter(
+  total_popE.x>400
+)%>%summary()
+```
+```{r}
 #Find walking distance buffers around free wifi spots with computers 
 free_wifi_buffers <- free_wifi_spots %>%
   filter(computers_=="Y" & to_display=="ACTIVE")%>%
@@ -807,7 +814,7 @@ ggplot(philly_digital_access)+
   )+
   geom_sf(
     data=digit_vulnerable_philly,
-    aes(fill=percent_no_bb+percent_no_comp)
+    aes(fill=percent_no_bb+percent_smart_only)
   )+
   scale_fill_gradient(
     low="#FFCF33",
@@ -869,7 +876,7 @@ summary(digit_underserved)
 #note, the sum of estiamated households without computer and without broadband is not an accurate estimate of reality because those without one are likely overlapping with the other. This metric is just being used to create a metric showing reflecting broadband and computer need in one. 
 digit_underserved<-digit_underserved%>%
   mutate(
-    digit_need_heuristic = (total_popE.x - has_computerE)+(total_popE.x - has_broadbandE)
+    digit_need_heuristic = (total_hhE - smartphone_onlyE)+(total_hhE - has_broadbandE)
   )
 
 top_10_digit_underserved <- digit_underserved%>%
@@ -881,14 +888,14 @@ top_10_digit_underserved %>%
   select(c(
     "NAMELSAD",
     "percent_no_bb",
-    "percent_no_comp",
+    "percent_smart_only",
     "median_incomeE",
     "distance_wifi_spot_comp"
   )) %>%
   kable(
     col.names = c("Census Tract",
                   "Percent w/o Broadband",
-                  "Percent w/o a Computer", 
+                  "Percent w/o Smartphone Only", 
                   "Median Income", 
                   "Distance to Free Wi-Fi spot w/ Computer"),
     digits = 1,
@@ -951,15 +958,8 @@ ggplot(philly_digital_access)+
     plot.caption = element_text(hjust = 0.5, size = 9, margin = margin(t = 10))
   )
 ```
-**Analysis requirements:**
 
-- Clear code comments explaining each step
-- Appropriate CRS transformations
-- Summary statistics or counts
-- At least one map showing your findings
-- Brief interpretation of results (3-5 sentences)
-
-**Your interpretation:**
+**Interpretation:**
 
 While the Free Wi-Fi Spots in Philadelphia are a very promising program to help bridge the gap for those without internet and a computer at home, a lot of the centers with computers are outside walking distance for the most digitally vulnerable in Philadelphia. There are 30 total tracts in Philly that completely fall outside walking distance to a Wi-Fi computer center, mostly concentrated in North Philadelphia. The estimated number of households in these 30 tracts without broadband is 103,418 and without a computer is 100,478. The average distance from these underserved tracts to the nearest free Wi-Fi and computer center is 7 miles.
 
