@@ -1,5 +1,0 @@
-"0","#| echo: true"
-"0","#| eval: true"
-"0","library(caret)"
-"2","Error in library(caret) : there is no package called ‘caret’
-"

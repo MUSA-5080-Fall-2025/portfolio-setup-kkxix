@@ -1,8 +1,0 @@
-"0","#| include: false"
-"0","options(scipen = 999)"
-"0","library(tidyverse)"
-"0","library(tidycensus)"
-"0","library(broom)"
-"0","library(scales)"
-"0",""
-"0","census_api_key(""42bf8a20a3df1def380f330cf7edad0dd5842ce6"")"

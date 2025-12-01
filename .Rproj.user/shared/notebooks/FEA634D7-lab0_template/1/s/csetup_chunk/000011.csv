@@ -1,6 +1,0 @@
-"0","# Read in the car sales data
-# Make sure the data file is in your lab_0/data/ folder
-car_data <- read_csv(""data/car_sales_data.csv"")
-"
-"2","Error: 'data/car_sales_data.csv' does not exist in current working directory ('C:/Users/knoxk/OneDrive/Documents/musa-5080/portfolio-setup-kkxix/labs/lab0/scripts').
-"

@@ -41,7 +41,9 @@ website:
           - href: labs/lab2/Knox_Katie_Assignment2.qmd
             text: "Assignment 2: Spatial Analysis and Visualization"
           - href: labs/lab_4/Knox_Katie_Assignment4.qmd
-            text: "Assignment 4: Spatial Analysis and Visualization" 
+            text: "Assignment 4: Spatial Predictive Analysis" 
+          - href: labs/lab5/scripts/Knox_Katie_Assignment5.qmd
+            text: "Assignment 5: Space-Time Prediction of Bike Share Demand" 
 
 format:
   html:
